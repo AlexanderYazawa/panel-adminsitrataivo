@@ -167,7 +167,7 @@
   </header>
 
   <div class="storage-warning" id="storageWarning" style="display:none">
-    <span>⚠️ Esta vista previa no puede guardar cambios de forma permanente en este navegador — al recargar la página, vuelve a los datos originales. Descargá el CSV de cada solapa antes de cerrar si necesitás conservar lo que edites.</span>
+    <span>⚠️ No se pudo conectar con la base de datos compartida — tus cambios se están guardando solo en este navegador por ahora. Descargá el CSV de cada solapa como respaldo hasta que vuelva la conexión.</span>
   </div>
 
   <nav class="tabs" id="tabs">
@@ -292,7 +292,22 @@
   </footer>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+var firebaseConfig = {
+  apiKey: "AIzaSyB1EE_S6X46pxN9Zr6yMCuPUJoeXqebAbc",
+  authDomain: "grupo-roma-panel.firebaseapp.com",
+  projectId: "grupo-roma-panel",
+  storageBucket: "grupo-roma-panel.firebasestorage.app",
+  messagingSenderId: "569915584208",
+  appId: "1:569915584208:web:c46f345d12337b1a8e78d5"
+};
+var fbApp = initializeApp(firebaseConfig);
+var db = getFirestore(fbApp);
+var stateDocRef = doc(db, "panel_state", "current");
+
 (function(){
   var STORAGE_KEY = "roma_panel_admin_v2";
   var STORAGE_KEY_V1 = "roma_panel_pagos_v1";
@@ -1525,14 +1540,18 @@
     return migrateV1() || defaultState();
   }
 
+  var lastPushedAt = null;
   function save(){
     state.updatedAt = new Date().toISOString();
-    try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+    lastPushedAt = state.updatedAt;
+    setDoc(stateDocRef, state).then(function(){
       storageBroken = false;
-    }catch(e){
+      updateStorageWarning();
+    }).catch(function(){
       storageBroken = true;
-    }
+      updateStorageWarning();
+    });
     renderFooter();
     updateStorageWarning();
   }
@@ -2018,15 +2037,34 @@
   });
 
   document.getElementById("btnReset").addEventListener("click", function(){
-    if(!confirm("Esto borra todos los cambios guardados (las 3 solapas) y vuelve a los datos originales. ¿Seguir?")) return;
+    if(!confirm("Esto borra todos los cambios guardados (las 3 solapas, para todos) y vuelve a los datos originales. ¿Seguir?")) return;
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STORAGE_KEY_V1);
     state = defaultState();
     render();
+    save();
   });
 
   render();
   updateStorageWarning();
+
+  onSnapshot(stateDocRef, function(snap){
+    if(!snap.exists()){
+      // primera vez que se usa: todavía no hay nada en la nube, subimos los datos de origen.
+      setDoc(stateDocRef, state);
+      lastPushedAt = state.updatedAt;
+      return;
+    }
+    var remote = snap.data();
+    if(remote.updatedAt === lastPushedAt) return; // eco de nuestro propio guardado, ya lo tenemos
+    state = remote;
+    render();
+    storageBroken = false;
+    updateStorageWarning();
+  }, function(){
+    storageBroken = true;
+    updateStorageWarning();
+  });
   setupScrollSync("pagos", "scrollTopPagos", "tableScrollPagos");
   setupScrollSync("ingresos", "scrollTopIngresos", "tableScrollIngresos");
   setupScrollSync("nominas", "scrollTopNominas", "tableScrollNominas");
