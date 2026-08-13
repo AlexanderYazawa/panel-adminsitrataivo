@@ -1506,16 +1506,17 @@
       if(raw){
         var s = JSON.parse(raw);
         // el esquema de Ingresos cambió (ahora trae los datos reales de cobros): si lo guardado
-        // es el placeholder vacío o el esquema viejo, se reemplaza por los datos por defecto.
-        if(!s.ingresos || !s.ingresos.rows || !s.ingresos.rows.length || s.ingresos.rows[0].nombre === undefined){
+        // es del esquema viejo se reemplaza por los datos por defecto. Un array vacío es un
+        // estado válido (el usuario borró todo a propósito) y se respeta, nunca se repone solo.
+        if(!s.ingresos || !s.ingresos.rows){
+          s.ingresos = {rows: DEFAULT_INGRESOS.map(function(r){ return Object.assign({}, r); })};
+        } else if(s.ingresos.rows.length && s.ingresos.rows[0].nombre === undefined){
           s.ingresos = {rows: DEFAULT_INGRESOS.map(function(r){ return Object.assign({}, r); })};
         }
-        // si alguna solapa quedó en cero filas (se borró todo, se pegó un CSV vacío, etc.)
-        // se repone con los datos de origen en vez de mostrar la tabla vacía para siempre.
-        if(!s.pagos || !s.pagos.rows || !s.pagos.rows.length){
+        if(!s.pagos || !s.pagos.rows){
           s.pagos = {rows: DEFAULT_PAGOS.map(function(r){ return Object.assign({}, r); })};
         }
-        if(!s.nominas || !s.nominas.rows || !s.nominas.rows.length){
+        if(!s.nominas || !s.nominas.rows){
           s.nominas = {rows: DEFAULT_NOMINAS.map(function(r){ return Object.assign({}, r); })};
         }
         return s;
