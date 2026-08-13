@@ -2908,7 +2908,7 @@ var stateDocRef = doc(db, "panel_state", "current");
     var rows = [];
     for(var li=1; li<lines.length; li++){
       var cells = lines[li].split(delim);
-      var norm = function(s){ return String(s).toLowerCase().replace(/[^a-z0-9]/g,""); };
+      var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,""); };
       var get = function(label, idx){
         var nlabel = norm(label);
         var exactIdx = -1, subIdx = -1;
