@@ -189,9 +189,9 @@
         <div class="disp-card"><div class="label">Banco</div><div class="val num">US$ 11,400.00</div><div class="sub">10-ago</div></div>
         <div class="disp-card"><div class="label">Tesoro</div><div class="val num">US$ 6,100.00</div><div class="sub">10-ago</div></div>
         <div class="disp-card"><div class="label">Posibles ingresos</div><div class="val num">—</div><div class="sub">14-ago</div></div>
-        <div class="disp-card"><div class="label">Total USD</div><div class="val num">US$ 17,500.00</div></div>
         <div class="disp-card"><div class="label">Tipo de cambio</div><div class="val num">$ 1,500.00</div></div>
-        <div class="disp-card accent" style="border-color:var(--accent)"><div class="label">Disponibilidad ARS</div><div class="val num">$ 26,250,000.00</div></div>
+        <div class="disp-card accent" style="border-color:var(--accent)"><div class="label">Restante (USD)</div><div class="val num" id="dispRestanteUSD">US$ 17,500.00</div><div class="sub">de US$ 17.500 originales</div></div>
+        <div class="disp-card accent" style="border-color:var(--accent)"><div class="label">Restante (ARS)</div><div class="val num" id="dispRestanteARS">$ 26,250,000.00</div><div class="sub">baja al marcar Hecho/Parcial</div></div>
       </div>
     </section>
 
@@ -2612,6 +2612,22 @@ var stateDocRef = doc(db, "panel_state", "current");
 
   function isUSD(moneda){ return /d[oó]lar|usd/i.test(moneda||""); }
 
+  var DISPONIBILIDAD_USD_TOTAL = 17500; // Banco + Tesoro
+  var TIPO_CAMBIO = 1500;
+
+  function updateDisponibilidad(){
+    var rows = state.pagos.rows;
+    var pagadoUSD = rows.filter(function(r){ return isUSD(r.moneda); })
+      .reduce(function(s,r){ return s + montoPagado(r,"importe"); },0);
+    var pagadoARSenUSD = rows.filter(function(r){ return !isUSD(r.moneda); })
+      .reduce(function(s,r){ return s + montoPagado(r,"importe"); },0) / TIPO_CAMBIO;
+    var restanteUSD = DISPONIBILIDAD_USD_TOTAL - pagadoUSD - pagadoARSenUSD;
+    var elUSD = document.getElementById("dispRestanteUSD");
+    var elARS = document.getElementById("dispRestanteARS");
+    if(elUSD) elUSD.textContent = "US$ " + Number(restanteUSD).toLocaleString("en-US",{minimumFractionDigits:2});
+    if(elARS) elARS.textContent = money(restanteUSD * TIPO_CAMBIO);
+  }
+
   function pagosStatsHtml(rows){
     var usdRows = rows.filter(function(r){ return isUSD(r.moneda); });
     var arsRows = rows.filter(function(r){ return !isUSD(r.moneda); });
@@ -2648,6 +2664,7 @@ var stateDocRef = doc(db, "panel_state", "current");
         + '</tr>';
     }).join("");
     document.getElementById("statsPagos").innerHTML = pagosStatsHtml(rows);
+    updateDisponibilidad();
   }
 
   function ingresosStatsHtml(rows){
@@ -2804,6 +2821,7 @@ var stateDocRef = doc(db, "panel_state", "current");
   function recalcStatsOnly(tab){
     if(tab==="pagos"){
       document.getElementById("statsPagos").innerHTML = pagosStatsHtml(state.pagos.rows);
+      updateDisponibilidad();
     } else if(tab==="ingresos"){
       document.getElementById("statsIngresos").innerHTML = ingresosStatsHtml(state.ingresos.rows);
     } else if(tab==="nominas"){
