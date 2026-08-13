@@ -2935,7 +2935,13 @@ var stateDocRef = doc(db, "panel_state", "current");
       cfg.importMap.forEach(function(pair, idx){
         var key = pair[0], label = pair[1];
         var raw = get(label, idx);
-        row[key] = (key==="importe"||key==="abonar"||key==="salario"||key==="adeudado") ? num(raw) : raw;
+        if(key==="importe"||key==="abonar"||key==="salario"||key==="adeudado"){
+          // Athan exporta Pagos con el importe en negativo (salida de caja); acá se maneja
+          // como una deuda, siempre en positivo, para que "Hecho"/"Parcial" resten bien.
+          row[key] = Math.abs(num(raw));
+        } else {
+          row[key] = raw;
+        }
       });
       row.estado = "pendiente"; row.abonos = [];
       rows.push(row);
