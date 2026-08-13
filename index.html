@@ -87,6 +87,7 @@
   .disp-card .label{font-size:.625rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:700;}
   .disp-card .val{font-family:var(--font-data); font-size:.9rem; font-weight:600;}
   .disp-card .sub{font-size:.6875rem; color:var(--muted); font-family:var(--font-data);}
+  .disp-input{width:100%; padding:.2rem .3rem; font-size:.9rem; font-weight:600; margin-top:.1rem;}
 
   .table-scroll{overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow);}
   .scroll-top{overflow-x:auto; overflow-y:hidden; height:14px; margin-bottom:6px;}
@@ -189,9 +190,11 @@
         <div class="disp-card"><div class="label">Banco</div><div class="val num">US$ 11,400.00</div><div class="sub">10-ago</div></div>
         <div class="disp-card"><div class="label">Tesoro</div><div class="val num">US$ 6,100.00</div><div class="sub">10-ago</div></div>
         <div class="disp-card"><div class="label">Posibles ingresos</div><div class="val num">—</div><div class="sub">14-ago</div></div>
-        <div class="disp-card"><div class="label">Tipo de cambio</div><div class="val num">$ 1,500.00</div></div>
-        <div class="disp-card accent" style="border-color:var(--accent)"><div class="label">Restante (USD)</div><div class="val num" id="dispRestanteUSD">US$ 17,500.00</div><div class="sub">de US$ 17.500 · solo baja con pagos en dólares</div></div>
-        <div class="disp-card accent" style="border-color:var(--accent)"><div class="label">Restante (ARS)</div><div class="val num" id="dispRestanteARS">$ 26,250,000.00</div><div class="sub">de $ 26.250.000 · solo baja con pagos en pesos</div></div>
+        <div class="disp-card"><div class="label">Tipo de cambio</div><input type="number" step="0.01" class="disp-input num" id="tipoCambioInput" value="1500" /></div>
+        <div class="disp-card"><div class="label">Disponibilidad (USD)</div><input type="number" step="0.01" class="disp-input num" id="dispUsdTotalInput" value="17500" /><div class="sub">editable a mano</div></div>
+        <div class="disp-card"><div class="label">Disponibilidad (ARS)</div><input type="number" step="0.01" class="disp-input num" id="dispArsTotalInput" value="26250000" /><div class="sub">editable a mano</div></div>
+        <div class="disp-card accent" style="border-color:var(--accent)"><div class="label">Restante (USD)</div><div class="val num" id="dispRestanteUSD">US$ 17,500.00</div><div class="sub">baja sola con pagos en dólares</div></div>
+        <div class="disp-card accent" style="border-color:var(--accent)"><div class="label">Restante (ARS)</div><div class="val num" id="dispRestanteARS">$ 26,250,000.00</div><div class="sub">baja sola con pagos en pesos</div></div>
       </div>
     </section>
 
@@ -2410,6 +2413,7 @@ var stateDocRef = doc(db, "panel_state", "current");
       pagos:{rows: DEFAULT_PAGOS.map(function(r){ return Object.assign({}, r); })},
       ingresos:{rows: DEFAULT_INGRESOS.map(function(r){ return Object.assign({}, r); })},
       nominas:{rows: DEFAULT_NOMINAS.map(function(r){ return Object.assign({}, r); })},
+      disponibilidad: {usdTotal: 17500, arsTotal: 26250000, tipoCambio: 1500},
       updatedAt:null
     };
   }
@@ -2449,6 +2453,9 @@ var stateDocRef = doc(db, "panel_state", "current");
     }
     if(!s.nominas || !s.nominas.rows){
       s.nominas = {rows: DEFAULT_NOMINAS.map(function(r){ return Object.assign({}, r); })};
+    }
+    if(!s.disponibilidad){
+      s.disponibilidad = {usdTotal: 17500, arsTotal: 26250000, tipoCambio: 1500};
     }
     return s;
   }
@@ -2554,20 +2561,22 @@ var stateDocRef = doc(db, "panel_state", "current");
 
   function isUSD(moneda){ return /d[oó]lar|usd/i.test(moneda||""); }
 
-  var DISPONIBILIDAD_USD_TOTAL = 17500; // Banco + Tesoro
-  var DISPONIBILIDAD_ARS_TOTAL = 26250000; // pozo de pesos, independiente del de dólares
-  var TIPO_CAMBIO = 1500; // solo informativo, ya no se usa para convertir entre pozos
-
   function updateDisponibilidad(){
     var rows = state.pagos.rows;
     var pagadoUSD = rows.filter(function(r){ return isUSD(r.moneda); })
       .reduce(function(s,r){ return s + montoPagado(r,"importe"); },0);
     var pagadoARS = rows.filter(function(r){ return !isUSD(r.moneda); })
       .reduce(function(s,r){ return s + montoPagado(r,"importe"); },0);
-    var restanteUSD = DISPONIBILIDAD_USD_TOTAL - pagadoUSD;
-    var restanteARS = DISPONIBILIDAD_ARS_TOTAL - pagadoARS;
+    var restanteUSD = state.disponibilidad.usdTotal - pagadoUSD;
+    var restanteARS = state.disponibilidad.arsTotal - pagadoARS;
     var elUSD = document.getElementById("dispRestanteUSD");
     var elARS = document.getElementById("dispRestanteARS");
+    var elUsdInput = document.getElementById("dispUsdTotalInput");
+    var elArsInput = document.getElementById("dispArsTotalInput");
+    var elTC = document.getElementById("tipoCambioInput");
+    if(elUsdInput && document.activeElement !== elUsdInput) elUsdInput.value = state.disponibilidad.usdTotal;
+    if(elArsInput && document.activeElement !== elArsInput) elArsInput.value = state.disponibilidad.arsTotal;
+    if(elTC && document.activeElement !== elTC) elTC.value = state.disponibilidad.tipoCambio;
     if(elUSD) elUSD.textContent = "US$ " + Number(restanteUSD).toLocaleString("en-US",{minimumFractionDigits:2});
     if(elARS) elARS.textContent = money(restanteARS);
   }
@@ -3000,6 +3009,14 @@ var stateDocRef = doc(db, "panel_state", "current");
     a.download = filename;
     document.body.appendChild(a); a.click(); a.remove();
     msg.style.color = "var(--ink-soft)"; msg.textContent = "Descargado.";
+  });
+
+  [["dispUsdTotalInput","usdTotal"],["dispArsTotalInput","arsTotal"],["tipoCambioInput","tipoCambio"]].forEach(function(pair){
+    document.getElementById(pair[0]).addEventListener("input", function(e){
+      state.disponibilidad[pair[1]] = parseFloat(e.target.value) || 0;
+      save();
+      updateDisponibilidad();
+    });
   });
 
   document.getElementById("btnReset").addEventListener("click", function(){
