@@ -1,0 +1,2036 @@
+<title>Grupo Roma · Panel de Administración</title>
+<style>
+  :root{
+    --bg:#F5F5F1; --surface:#FFFFFF; --surface-2:#ECEBE4; --surface-3:#E2E0D6;
+    --border:#DEDCD2; --border-strong:#C7C4B5;
+    --ink:#1B1D19; --ink-soft:#55584F; --muted:#8B8D80;
+    --accent:#3D4FBF; --accent-soft:#E5E7FA; --accent-ink:#FFFFFF;
+    --good:#1F8A5F; --good-soft:#E1F3EA;
+    --warning:#9A6B00; --warning-soft:#FBF0D6;
+    --critical:#C0392B; --critical-soft:#FAE4E1;
+    --shadow:0 1px 2px rgba(20,20,10,.05), 0 8px 24px rgba(20,20,10,.06);
+    --radius:10px;
+    --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-data: ui-monospace, "Cascadia Mono", "SFMono-Regular", "Consolas", monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#131417; --surface:#1A1C20; --surface-2:#212327; --surface-3:#282A30;
+      --border:#2B2E33; --border-strong:#3A3D44;
+      --ink:#ECEDE9; --ink-soft:#AFB2A8; --muted:#797C74;
+      --accent:#7C8AFF; --accent-soft:#252A47; --accent-ink:#0F1120;
+      --good:#3FBE85; --good-soft:#0F2A21;
+      --warning:#E0B23D; --warning-soft:#332707;
+      --critical:#E2685C; --critical-soft:#391B17;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#131417; --surface:#1A1C20; --surface-2:#212327; --surface-3:#282A30;
+    --border:#2B2E33; --border-strong:#3A3D44;
+    --ink:#ECEDE9; --ink-soft:#AFB2A8; --muted:#797C74;
+    --accent:#7C8AFF; --accent-soft:#252A47; --accent-ink:#0F1120;
+    --good:#3FBE85; --good-soft:#0F2A21;
+    --warning:#E0B23D; --warning-soft:#332707;
+    --critical:#E2685C; --critical-soft:#391B17;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-ui); font-size:15px; line-height:1.45; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{text-wrap:balance; margin:0}
+  p{margin:0}
+  .num{font-family:var(--font-data); font-variant-numeric:tabular-nums; font-feature-settings:"tnum";}
+  button{font-family:inherit}
+  input,textarea{font-family:inherit; color:inherit; background:var(--surface); border:1px solid var(--border); border-radius:6px;}
+  input:focus-visible, textarea:focus-visible, button:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
+
+  .wrap{max-width:1280px; margin:0 auto; padding:2rem 1.5rem 5rem; display:flex; flex-direction:column; gap:1.5rem;}
+
+  header.top{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:1rem; border-bottom:2px solid var(--ink); padding-bottom:1.1rem;}
+  .brand{display:flex; flex-direction:column; gap:.3rem;}
+  .brand .eyebrow{font-size:.6875rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:700;}
+  .brand h1{font-size:1.65rem; font-weight:800; letter-spacing:-.01em;}
+  .top .fecha{font-family:var(--font-data); font-size:.8rem; color:var(--ink-soft); text-align:right;}
+  .top .fecha b{color:var(--ink); font-size:.95rem;}
+
+  .storage-warning{display:flex; align-items:center; gap:.5rem; background:var(--critical-soft); border:1px solid var(--critical); border-radius:8px; padding:.7rem 1rem; font-size:.8125rem; color:var(--critical);}
+  nav.tabs{display:flex; gap:.4rem; border-bottom:1px solid var(--border);}
+  nav.tabs button{all:unset; cursor:pointer; padding:.6rem 1rem; font-size:.875rem; font-weight:700; color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-1px;}
+  nav.tabs button:hover{color:var(--ink);}
+  nav.tabs button[aria-current="true"]{color:var(--accent); border-color:var(--accent);}
+  nav.tabs button .n{font-family:var(--font-data); font-size:.75rem; color:var(--muted); margin-left:.35rem;}
+
+  .tabpanel{display:none; flex-direction:column; gap:1.5rem;}
+  .tabpanel[data-visible="true"]{display:flex;}
+
+  .stats{display:grid; grid-template-columns:repeat(5,1fr); gap:.75rem;}
+  .stats.cols-3{grid-template-columns:repeat(3,1fr);}
+  .stats.cols-4{grid-template-columns:repeat(4,1fr);}
+  @media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr);}}
+  .stat{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:.85rem 1rem; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:.3rem;}
+  .stat .label{font-size:.6875rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:700;}
+  .stat .val{font-family:var(--font-data); font-size:1.15rem; font-weight:600; font-variant-numeric:tabular-nums;}
+  .stat.accent{border-color:var(--accent); background:var(--accent-soft);}
+  .stat.accent .val, .stat.accent .label{color:var(--accent);}
+  .stat.good .val{color:var(--good);}
+  .stat.warning .val{color:var(--warning);}
+
+  section.block{display:flex; flex-direction:column; gap:.75rem;}
+  .section-head{display:flex; align-items:baseline; justify-content:space-between; gap:1rem; flex-wrap:wrap;}
+  .section-head h2{font-size:1.1rem; font-weight:800;}
+  .section-head .hint{font-size:.8125rem; color:var(--muted);}
+
+  .disp-row{display:grid; grid-template-columns:repeat(6,1fr); gap:.6rem;}
+  @media (max-width:900px){.disp-row{grid-template-columns:repeat(3,1fr);}}
+  .disp-card{background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:.6rem .8rem;}
+  .disp-card .label{font-size:.625rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:700;}
+  .disp-card .val{font-family:var(--font-data); font-size:.9rem; font-weight:600;}
+  .disp-card .sub{font-size:.6875rem; color:var(--muted); font-family:var(--font-data);}
+
+  .table-scroll{overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow);}
+  .scroll-top{overflow-x:auto; overflow-y:hidden; height:14px; margin-bottom:6px;}
+  .scroll-top > div{height:1px;}
+  .table-scroll, .scroll-top{ scrollbar-width:thin; scrollbar-color:var(--accent) var(--surface-2); }
+  .table-scroll::-webkit-scrollbar, .scroll-top::-webkit-scrollbar{ height:10px; }
+  .table-scroll::-webkit-scrollbar-track, .scroll-top::-webkit-scrollbar-track{ background:var(--surface-2); border-radius:999px; }
+  .table-scroll::-webkit-scrollbar-thumb, .scroll-top::-webkit-scrollbar-thumb{ background-color:var(--accent); border-radius:999px; border:3px solid var(--surface-2); background-clip:padding-box; }
+  .table-scroll::-webkit-scrollbar-thumb:hover, .scroll-top::-webkit-scrollbar-thumb:hover{ background-color:var(--accent); filter:brightness(1.15); }
+  table{border-collapse:collapse; width:100%;}
+  thead th{position:sticky; top:0; background:var(--surface-2); text-align:left; font-size:.6875rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:700; padding:.6rem .7rem; border-bottom:1px solid var(--border-strong); white-space:nowrap;}
+  tbody td{padding:.65rem .7rem; border-bottom:1px solid var(--border); vertical-align:top; font-size:.875rem;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr[data-estado="hecho"]{background:color-mix(in srgb, var(--good-soft) 55%, transparent);}
+  tbody tr[data-estado="parcial"]{background:color-mix(in srgb, var(--warning-soft) 55%, transparent);}
+  tbody tr[data-estado="no_hecho"]{background:color-mix(in srgb, var(--critical-soft) 55%, transparent);}
+  .nombre-cell{font-weight:700; min-width:9rem;}
+  .fecha-cell{font-family:var(--font-data); color:var(--ink-soft); white-space:nowrap;}
+  .num-input{width:8.5rem; padding:.3rem .45rem; font-size:.8125rem;}
+  .num-input::before{content:"$ ";}
+  .text-input{width:11rem; padding:.3rem .45rem; font-size:.8125rem;}
+  .motivo-cell{display:flex; flex-direction:column; gap:.3rem; min-width:14rem;}
+  .motivo-input{width:100%; padding:.3rem .45rem; font-size:.75rem;}
+  .motivo-input.si{color:var(--good);}
+  .motivo-input.no{color:var(--critical);}
+  .motivo-input.acl{color:var(--muted);}
+
+  .seg{display:inline-flex; border:1px solid var(--border-strong); border-radius:7px; overflow:hidden;}
+  .seg button{all:unset; cursor:pointer; padding:.32rem .55rem; font-size:.75rem; font-weight:700; color:var(--ink-soft); border-right:1px solid var(--border-strong);}
+  .seg button:last-child{border-right:none;}
+  .seg button:hover{background:var(--surface-2);}
+  .seg button[aria-pressed="true"].b-hecho{background:var(--good); color:#fff;}
+  .seg button[aria-pressed="true"].b-parcial{background:var(--warning); color:#fff;}
+  .seg button[aria-pressed="true"].b-no{background:var(--critical); color:#fff;}
+  .estado-cell{min-width:13rem;}
+
+  .abonos{margin-top:.5rem; display:flex; flex-direction:column; gap:.3rem;}
+  .abono-row{display:flex; align-items:center; gap:.3rem;}
+  .abono-row input[type="text"]{width:4.5rem; padding:.22rem .35rem; font-size:.7rem;}
+  .abono-row input[type="number"]{width:6rem; padding:.22rem .35rem; font-size:.7rem;}
+  .abono-del{all:unset; cursor:pointer; color:var(--critical); font-size:.85rem; padding:0 .2rem;}
+  .add-abono{all:unset; cursor:pointer; font-size:.7rem; font-weight:700; color:var(--accent);}
+  .add-abono:hover{text-decoration:underline;}
+  .abonos-total{font-size:.7rem; color:var(--muted); font-family:var(--font-data);}
+
+  .del-btn{all:unset; cursor:pointer; color:var(--critical); font-size:.95rem; padding:.2rem .4rem; border-radius:5px;}
+  .del-btn:hover{background:var(--critical-soft);}
+
+  .add-row-btn{all:unset; cursor:pointer; align-self:flex-start; display:inline-flex; align-items:center; gap:.4rem; padding:.4rem .75rem; border-radius:7px; font-size:.8125rem; font-weight:700; border:1px dashed var(--border-strong); color:var(--ink-soft);}
+  .add-row-btn:hover{background:var(--surface-2); border-style:solid;}
+
+  .panel-io{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:1.1rem 1.3rem; display:flex; flex-direction:column; gap:.9rem;}
+  .io-grid{display:grid; grid-template-columns:1fr 1fr; gap:1.2rem;}
+  @media (max-width:800px){.io-grid{grid-template-columns:1fr;}}
+  .io-col{display:flex; flex-direction:column; gap:.5rem;}
+  .io-col h3{font-size:.8125rem; font-weight:800;}
+  .io-col p.note{font-size:.75rem; color:var(--muted); line-height:1.5;}
+  textarea.paste{width:100%; min-height:5rem; padding:.5rem; font-size:.75rem; font-family:var(--font-data); resize:vertical;}
+  .btn{all:unset; cursor:pointer; display:inline-flex; align-items:center; gap:.4rem; padding:.45rem .8rem; border-radius:7px; font-size:.8125rem; font-weight:700; border:1px solid var(--border-strong);}
+  .btn:hover{background:var(--surface-2);}
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .btn.primary:hover{filter:brightness(1.06);}
+  .file-row{display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;}
+  .status-msg{font-size:.75rem; color:var(--good); min-height:1em;}
+
+  footer.foot{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem; font-size:.75rem; color:var(--muted); border-top:1px solid var(--border); padding-top:.9rem;}
+  footer.foot button.link{all:unset; cursor:pointer; color:var(--critical); font-weight:700; font-size:.75rem;}
+  footer.foot button.link:hover{text-decoration:underline;}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="eyebrow">Grupo Roma · Tesorería</span>
+      <h1>Panel de Administración</h1>
+    </div>
+    <div class="fecha">Estado de situación<br><b id="fechaEstado">14-08-2026</b></div>
+  </header>
+
+  <div class="storage-warning" id="storageWarning" style="display:none">
+    <span>⚠️ Esta vista previa no puede guardar cambios de forma permanente en este navegador — al recargar la página, vuelve a los datos originales. Descargá el CSV de cada solapa antes de cerrar si necesitás conservar lo que edites.</span>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button type="button" data-tab="pagos" aria-current="true">Pagos</button>
+    <button type="button" data-tab="ingresos" aria-current="false">Ingresos</button>
+    <button type="button" data-tab="nominas" aria-current="false">Nóminas</button>
+  </nav>
+
+  <!-- ===== PAGOS ===== -->
+  <div class="tabpanel" data-tab="pagos" data-visible="true">
+    <section class="stats" id="statsPagos"></section>
+
+    <section class="block">
+      <div class="section-head">
+        <h2>Disponibilidad</h2>
+        <span class="hint">Relevado al 12-08-2026 · en USD salvo indicación</span>
+      </div>
+      <div class="disp-row">
+        <div class="disp-card"><div class="label">Banco</div><div class="val num">US$ 11,400.00</div><div class="sub">10-ago</div></div>
+        <div class="disp-card"><div class="label">Tesoro</div><div class="val num">US$ 6,100.00</div><div class="sub">10-ago</div></div>
+        <div class="disp-card"><div class="label">Posibles ingresos</div><div class="val num">—</div><div class="sub">14-ago</div></div>
+        <div class="disp-card"><div class="label">Total USD</div><div class="val num">US$ 17,500.00</div></div>
+        <div class="disp-card"><div class="label">Tipo de cambio</div><div class="val num">$ 1,500.00</div></div>
+        <div class="disp-card accent" style="border-color:var(--accent)"><div class="label">Disponibilidad ARS</div><div class="val num">$ 26,250,000.00</div></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="section-head">
+        <h2>Compromisos</h2>
+        <span class="hint">Editá el importe, tildá el estado real y sumá abonos parciales o una observación.</span>
+      </div>
+      <div class="scroll-top" id="scrollTopPagos"><div></div></div>
+      <div class="table-scroll" id="tableScrollPagos">
+        <table>
+          <thead><tr>
+            <th>Compromiso</th><th>Importe</th><th>Fecha</th><th>A abonar (plan)</th>
+            <th>Motivo</th><th>Criterio de decisión</th><th>Estado</th><th>Observación</th><th></th>
+          </tr></thead>
+          <tbody id="rowsPagos"></tbody>
+        </table>
+      </div>
+      <button type="button" class="add-row-btn" data-add="pagos">+ Agregar compromiso</button>
+    </section>
+  </div>
+
+  <!-- ===== INGRESOS ===== -->
+  <div class="tabpanel" data-tab="ingresos" data-visible="false">
+    <section class="stats cols-3" id="statsIngresos"></section>
+    <section class="block">
+      <div class="section-head">
+        <h2>Ingresos (cobros a clientes)</h2>
+        <span class="hint">Resumen cargado desde el archivo de origen. Para actualizarlo, subí el Excel/CSV nuevo abajo — acá solo se elimina o se ajusta algún concepto puntual.</span>
+      </div>
+      <div class="scroll-top" id="scrollTopIngresos"><div></div></div>
+      <div class="table-scroll" id="tableScrollIngresos">
+        <table>
+          <thead><tr>
+            <th>Nro</th><th>Cliente</th><th>Proyecto</th><th>Empresa</th><th>Concepto</th><th>Moneda</th>
+            <th>Importe</th><th>Fecha</th><th>Fecha de cobro</th><th>Criterio de decisión</th><th>Observación</th><th></th>
+          </tr></thead>
+          <tbody id="rowsIngresos"></tbody>
+        </table>
+      </div>
+      <button type="button" class="add-row-btn" data-add="ingresos">+ Agregar ingreso</button>
+    </section>
+  </div>
+
+  <!-- ===== NOMINAS ===== -->
+  <div class="tabpanel" data-tab="nominas" data-visible="false">
+    <section class="stats cols-3" id="statsNominas"></section>
+    <section class="block">
+      <div class="section-head">
+        <h2>Nóminas</h2>
+        <span class="hint">Editá el adeudado, tildá el pago real y sumá abonos parciales o una observación.</span>
+      </div>
+      <div class="scroll-top" id="scrollTopNominas"><div></div></div>
+      <div class="table-scroll" id="tableScrollNominas">
+        <table>
+          <thead><tr>
+            <th>Nombre</th><th>Estado laboral</th><th>Salario mensual</th><th>Adeudado</th>
+            <th>Criterio de decisión</th><th>Estado de pago</th><th>Comentarios</th><th></th>
+          </tr></thead>
+          <tbody id="rowsNominas"></tbody>
+        </table>
+      </div>
+      <button type="button" class="add-row-btn" data-add="nominas">+ Agregar persona</button>
+    </section>
+  </div>
+
+  <!-- ===== IMPORT / EXPORT (solapa activa) ===== -->
+  <section class="block">
+    <div class="section-head">
+      <h2>Cargar / actualizar datos</h2>
+      <span class="hint">Aplica a la solapa activa: <b id="ioTabName">Pagos</b> · fuente: Athan, exportado a Excel/CSV cada tanto</span>
+    </div>
+    <div class="panel-io">
+      <div class="io-grid">
+        <div class="io-col">
+          <h3>Importar</h3>
+          <p class="note" id="ioNote"></p>
+          <textarea class="paste" id="pasteArea" placeholder="Pegá filas copiadas de Excel..."></textarea>
+          <div class="file-row">
+            <button class="btn primary" id="btnImportPaste">Reemplazar tabla con lo pegado</button>
+            <input type="file" id="fileInput" accept=".csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+          </div>
+          <p class="status-msg" id="importMsg"></p>
+        </div>
+        <div class="io-col">
+          <h3>Exportar</h3>
+          <p class="note">Descarga el estado actual de la solapa activa (montos, estado y observaciones) como CSV.</p>
+          <button class="btn" id="btnExport">Descargar estado (CSV)</button>
+          <p class="status-msg" id="exportMsg"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span id="lastUpdated">Guardado localmente en este navegador.</span>
+    <button class="link" id="btnReset">Restaurar datos originales</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var STORAGE_KEY = "roma_panel_admin_v2";
+  var STORAGE_KEY_V1 = "roma_panel_pagos_v1";
+
+  var DEFAULT_PAGOS = [
+    {id:"cheque", compromiso:"Cheque", importe:11219784.00, fecha:"14-ago", abonar:11219784.00, razon_si:"Compromiso bancario ineludible", razon_no:"", aclaracion:"Cheque EPE", criterio:"", estado:"pendiente", abonos:[], observacion:""},
+    {id:"arca", compromiso:"ARCA - Roma", importe:9931409.00, fecha:"14-ago", abonar:4725254.00, razon_si:"Compromiso fiscal ineludible", razon_no:"", aclaracion:"Asesoramiento Ignacio (estudio contable): la caída de los planes de pago implica riesgo fiscal", criterio:"", estado:"pendiente", abonos:[], observacion:""},
+    {id:"agostina", compromiso:"Agostina", importe:3600000.00, fecha:"10-ago", abonar:300000.00, razon_si:"Solo parcial", razon_no:"", aclaracion:"Muestra de buena voluntad y apertura al diálogo por nuevo valor", criterio:"", estado:"pendiente", abonos:[], observacion:""},
+    {id:"sobre_junio", compromiso:"Sobre junio", importe:8269000.00, fecha:"10-jul", abonar:0, razon_si:"", razon_no:"No hay disponibilidad", aclaracion:"", criterio:"", estado:"pendiente", abonos:[], observacion:""},
+    {id:"sueldo_julio", compromiso:"Sueldo julio (banco)", importe:12820000.00, fecha:"6-ago", abonar:6410000.00, razon_si:"Asignación a Luis, Milagros, Maximiliano, Luz", razon_no:"Mariano, Margarita, Guido, Horacio", aclaracion:"Compromiso legal", criterio:"", estado:"pendiente", abonos:[], observacion:""},
+    {id:"jornales_julio", compromiso:"Jornales 2° julio", importe:7550000.00, fecha:"6-ago", abonar:3775000.00, razon_si:"7 días de atraso en el pago. Solo se devengará el 50%.", razon_no:"", aclaracion:"", criterio:"", estado:"pendiente", abonos:[], observacion:""},
+    {id:"honorarios_julio", compromiso:"Honorarios julio", importe:6137000.00, fecha:"10-ago", abonar:0, razon_si:"", razon_no:"No hay disponibilidad — se puede postergar", aclaracion:"", criterio:"", estado:"pendiente", abonos:[], observacion:""},
+    {id:"sobres_julio", compromiso:"Sobres Julio", importe:12820000.00, fecha:"10-ago", abonar:0, razon_si:"", razon_no:"Mariano, Sixto, Nicolás — hoy no contamos con disponibilidad", aclaracion:"", criterio:"", estado:"pendiente", abonos:[], observacion:""}
+  ];
+
+  var DEFAULT_INGRESOS = [
+  {
+    "id": "i1",
+    "nro": 2487,
+    "nombre": "Franco Diego Ariel",
+    "proyecto": "CAMPO MADERO 2 - ROMA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 41",
+    "moneda": "Dólares",
+    "importe": 200,
+    "fecha": "2026-08-01",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i2",
+    "nro": 3605,
+    "nombre": "Castillo Debora Natalia",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ZAVALLA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 35",
+    "moneda": "Pesos",
+    "importe": 689167.08,
+    "fecha": "2026-08-01",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i3",
+    "nro": 3630,
+    "nombre": "Florentino David Oscar",
+    "proyecto": "TIERRA DE AUTORES - PUEBLO ESTHER",
+    "empresa": "Mr Schwarz",
+    "concepto": "Pagaré 31",
+    "moneda": "Dólares",
+    "importe": 415,
+    "fecha": "2026-08-01",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i4",
+    "nro": 3740,
+    "nombre": "Soto Elisabet Noemi",
+    "proyecto": "ORIGENES - SOLDINI",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 27",
+    "moneda": "Dólares",
+    "importe": 249,
+    "fecha": "2026-08-02",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i5",
+    "nro": 4843,
+    "nombre": "Flecha Claudia Carolina",
+    "proyecto": "EL NARANJO 2 - IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 22",
+    "moneda": "Dólares",
+    "importe": 689,
+    "fecha": "2026-08-03",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i6",
+    "nro": 7010,
+    "nombre": "Cipolletti Giovana",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ZAVALLA",
+    "empresa": "Mr Schwarz",
+    "concepto": "Entrega  Mr Schwarz",
+    "moneda": "Pesos",
+    "importe": 1,
+    "fecha": "2026-08-04",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i7",
+    "nro": 3754,
+    "nombre": "Vieyra Maria Victoria",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ROMA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 22",
+    "moneda": "Dólares",
+    "importe": 330,
+    "fecha": "2026-08-05",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i8",
+    "nro": 3828,
+    "nombre": "Pieroni Fabian Omar",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ZAVALLA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 23",
+    "moneda": "Dólares",
+    "importe": 294,
+    "fecha": "2026-08-05",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i9",
+    "nro": 4939,
+    "nombre": "Borre Mónica Liliana",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ROMA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 12",
+    "moneda": "Dólares",
+    "importe": 1140,
+    "fecha": "2026-08-05",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i10",
+    "nro": 5950,
+    "nombre": "Benitez Sosa Miguel",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 11",
+    "moneda": "Dólares",
+    "importe": 109,
+    "fecha": "2026-08-05",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i11",
+    "nro": 5963,
+    "nombre": "Antonelli  Natalia Valeria",
+    "proyecto": "ECO PUEBLO",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 5",
+    "moneda": "Dólares",
+    "importe": 1135,
+    "fecha": "2026-08-05",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i12",
+    "nro": 6988,
+    "nombre": "Alanis Priscila Ainalen",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ROMA",
+    "empresa": "Mr Schwarz",
+    "concepto": "Pagaré 2",
+    "moneda": "Dólares",
+    "importe": 430,
+    "fecha": "2026-08-05",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i13",
+    "nro": 3713,
+    "nombre": "Carpanetto Gaston Alejandro",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 29",
+    "moneda": "Dólares",
+    "importe": 337,
+    "fecha": "2026-08-06",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i14",
+    "nro": 4875,
+    "nombre": "Amico Patricia Noemi",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ZAVALLA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 20",
+    "moneda": "Dólares",
+    "importe": 331,
+    "fecha": "2026-08-06",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i15",
+    "nro": 3712,
+    "nombre": "Montero Pablo Damian",
+    "proyecto": "ORIGENES - SOLDINI",
+    "empresa": "Mr Schwarz",
+    "concepto": "Pagaré 30",
+    "moneda": "Dólares",
+    "importe": 318,
+    "fecha": "2026-08-07",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i16",
+    "nro": 2467,
+    "nombre": "Schiavone Joel",
+    "proyecto": "ORIGENES - SOLDINI",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 42",
+    "moneda": "Dólares",
+    "importe": 330,
+    "fecha": "2026-08-08",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i17",
+    "nro": 3655,
+    "nombre": "Emanuele  Julieta Andrea",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 30",
+    "moneda": "Dólares",
+    "importe": 420,
+    "fecha": "2026-08-08",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i18",
+    "nro": 3656,
+    "nombre": "Marenco  Maria Florencia",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 30",
+    "moneda": "Dólares",
+    "importe": 567,
+    "fecha": "2026-08-08",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i19",
+    "nro": 3806,
+    "nombre": "Sedano Alicia Mabel",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 24",
+    "moneda": "Dólares",
+    "importe": 279,
+    "fecha": "2026-08-08",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i20",
+    "nro": 3587,
+    "nombre": "Abraham Griselda Beatriz",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 36",
+    "moneda": "Pesos",
+    "importe": 1233827.18,
+    "fecha": "2026-08-09",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i21",
+    "nro": 3654,
+    "nombre": "Galeano Belen Araceli",
+    "proyecto": "CAMPO MADERO - IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 32",
+    "moneda": "Pesos",
+    "importe": 1146668.04,
+    "fecha": "2026-08-10",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i22",
+    "nro": 3786,
+    "nombre": "Fernandez Claudio Jorge",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 19",
+    "moneda": "Dólares",
+    "importe": 360,
+    "fecha": "2026-08-10",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i23",
+    "nro": 3825,
+    "nombre": "Iglesias Alejandro Omar",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 23",
+    "moneda": "Dólares",
+    "importe": 315,
+    "fecha": "2026-08-10",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i24",
+    "nro": 4863,
+    "nombre": "Sotelo Jesica Antonella",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ZAVALLA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 21",
+    "moneda": "Dólares",
+    "importe": 246,
+    "fecha": "2026-08-10",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i25",
+    "nro": 4872,
+    "nombre": "Luna Walter Cesar",
+    "proyecto": "ORIGENES - SOLDINI",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 20",
+    "moneda": "Pesos",
+    "importe": 872732.77,
+    "fecha": "2026-08-10",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i26",
+    "nro": 4843,
+    "nombre": "Flecha Claudia Carolina",
+    "proyecto": "EL NARANJO 2 - IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 22",
+    "moneda": "Dólares",
+    "importe": 689,
+    "fecha": "2026-08-11",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i27",
+    "nro": 3678,
+    "nombre": "Marcos Gabriela Susana",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ZAVALLA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 13",
+    "moneda": "Dólares",
+    "importe": 190,
+    "fecha": "2026-08-12",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i28",
+    "nro": 3727,
+    "nombre": "Sell Emanuel Nicolas",
+    "proyecto": "CAMPO MADERO - IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 19",
+    "moneda": "Dólares",
+    "importe": 800,
+    "fecha": "2026-08-12",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i29",
+    "nro": 3761,
+    "nombre": "Blanco Nicolas Alberto",
+    "proyecto": "EL NARANJO 2 - IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 26",
+    "moneda": "Dólares",
+    "importe": 197,
+    "fecha": "2026-08-12",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i30",
+    "nro": 3762,
+    "nombre": "Horvath Veronica Carina",
+    "proyecto": "VITTA - GENERAL LAGOS",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 22",
+    "moneda": "Dólares",
+    "importe": 470,
+    "fecha": "2026-08-12",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i31",
+    "nro": 3763,
+    "nombre": "LEZCHIK CLAUDIA ROSANA",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ZAVALLA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 24",
+    "moneda": "Dólares",
+    "importe": 425,
+    "fecha": "2026-08-12",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i32",
+    "nro": 6982,
+    "nombre": "Velazquez  Jorge Victor",
+    "proyecto": "ECO PUEBLO",
+    "empresa": "Mr Schwarz",
+    "concepto": "Pagaré 6",
+    "moneda": "Dólares",
+    "importe": 700,
+    "fecha": "2026-08-13",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i33",
+    "nro": 2448,
+    "nombre": "Duarte Fani Valeria",
+    "proyecto": "CAMPO MADERO 2 - ROMA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 38",
+    "moneda": "Dólares",
+    "importe": 277,
+    "fecha": "2026-08-15",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i34",
+    "nro": 2454,
+    "nombre": "de la torre jorge omar",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 42",
+    "moneda": "Dólares",
+    "importe": 594,
+    "fecha": "2026-08-15",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i35",
+    "nro": 2474,
+    "nombre": "Ibarra Dario Horacio",
+    "proyecto": "EL NARANJO 2 - IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 42",
+    "moneda": "Dólares",
+    "importe": 263,
+    "fecha": "2026-08-15",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i36",
+    "nro": 2492,
+    "nombre": "DEL POZO PAULA ANDREA",
+    "proyecto": "CAMPO MADERO 2 - ROMA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 41",
+    "moneda": "Dólares",
+    "importe": 201,
+    "fecha": "2026-08-15",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i37",
+    "nro": 2509,
+    "nombre": "gritti cecilia",
+    "proyecto": "VITTA - GENERAL LAGOS",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 41",
+    "moneda": "Pesos",
+    "importe": 733464.35,
+    "fecha": "2026-08-15",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i38",
+    "nro": 2522,
+    "nombre": "Maldonado Angel Alberto",
+    "proyecto": "CAMPO MADERO 2- IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 40",
+    "moneda": "Dólares",
+    "importe": 101,
+    "fecha": "2026-08-15",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i39",
+    "nro": 2567,
+    "nombre": "LOPEZ GABRIELA SOLEDAD",
+    "proyecto": "CAMPO MADERO 2- IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 38",
+    "moneda": "Pesos",
+    "importe": 903552.91,
+    "fecha": "2026-08-15",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i40",
+    "nro": 3660,
+    "nombre": "Barquero Analia Andrea",
+    "proyecto": "ORIGENES - SOLDINI",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 32",
+    "moneda": "Dólares",
+    "importe": 293,
+    "fecha": "2026-08-15",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i41",
+    "nro": 5946,
+    "nombre": "QUINTANA  IVAN GONZALO",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Mr Schwarz",
+    "concepto": "Pagaré 12",
+    "moneda": "Dólares",
+    "importe": 2000,
+    "fecha": "2026-08-15",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i42",
+    "nro": 5972,
+    "nombre": "Escobar  Ramona Susana",
+    "proyecto": "ECO PUEBLO",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 7",
+    "moneda": "Dólares",
+    "importe": 851,
+    "fecha": "2026-08-15",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i43",
+    "nro": 3812,
+    "nombre": "Chalhup Maira",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ZAVALLA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 24",
+    "moneda": "Dólares",
+    "importe": 300,
+    "fecha": "2026-08-16",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i44",
+    "nro": 4833,
+    "nombre": "Luna Mario Nicolas",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ZAVALLA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 23",
+    "moneda": "Dólares",
+    "importe": 258,
+    "fecha": "2026-08-16",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i45",
+    "nro": 5943,
+    "nombre": "Colussi Marcelo Alan",
+    "proyecto": "Clos del Este 1 / Ciudades del Vino",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 5",
+    "moneda": "Dólares",
+    "importe": 1277,
+    "fecha": "2026-08-16",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i46",
+    "nro": 6971,
+    "nombre": "Echeverria  Daniela Alejandra",
+    "proyecto": "ECO PUEBLO",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 7",
+    "moneda": "Dólares",
+    "importe": 1100,
+    "fecha": "2026-08-16",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i47",
+    "nro": 3792,
+    "nombre": "Roldan Lucas Jose",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 25",
+    "moneda": "Dólares",
+    "importe": 344,
+    "fecha": "2026-08-17",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i48",
+    "nro": 3804,
+    "nombre": "Depaz Santa Loli",
+    "proyecto": "CAMPO MADERO - IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 5",
+    "moneda": "Dólares",
+    "importe": 332,
+    "fecha": "2026-08-17",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i49",
+    "nro": 4878,
+    "nombre": "Ayala Debora Rocio",
+    "proyecto": "Vita Norte",
+    "empresa": "Mr Schwarz",
+    "concepto": "Pagaré 20",
+    "moneda": "Dólares",
+    "importe": 159,
+    "fecha": "2026-08-17",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "i50",
+    "nro": 4883,
+    "nombre": "Feta Maria Del Lujan",
+    "proyecto": "COMUNIDAD EVOLUTIVA - ZAVALLA",
+    "empresa": "Ms Weiss",
+    "concepto": "Cuota 19",
+    "moneda": "Dólares",
+    "importe": 788,
+    "fecha": "2026-08-17",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  }
+];
+
+  var DEFAULT_NOMINAS = [
+  {
+    "id": "n1",
+    "nombre": "Alejandro Omar Feres",
+    "estado_laboral": "Activo",
+    "salario": 1022000,
+    "adeudado": 556000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n2",
+    "nombre": "Mario aguirre",
+    "estado_laboral": "Activo",
+    "salario": 1419000,
+    "adeudado": 771000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n3",
+    "nombre": "Rios Sergio",
+    "estado_laboral": "Activo/ De baja desde el 14-08-2026",
+    "salario": 1131000,
+    "adeudado": 539000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n4",
+    "nombre": "Duilio García",
+    "estado_laboral": "Activo",
+    "salario": 1061000,
+    "adeudado": 545000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n5",
+    "nombre": "Zulema Carrera",
+    "estado_laboral": "Activo",
+    "salario": 1102000,
+    "adeudado": 592000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n6",
+    "nombre": "Fernandez Leonardo",
+    "estado_laboral": "Activo",
+    "salario": 1160000,
+    "adeudado": 644000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n7",
+    "nombre": "Ludueña Andres",
+    "estado_laboral": "De baja desde el 6-08-2026",
+    "salario": 1324000,
+    "adeudado": 761000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio y liquidacion dias trabajados",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n8",
+    "nombre": "Garcia Claudio",
+    "estado_laboral": "Activo",
+    "salario": 1114000,
+    "adeudado": 592000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n9",
+    "nombre": "García Walter",
+    "estado_laboral": "Activo",
+    "salario": 1659000,
+    "adeudado": 911000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n10",
+    "nombre": "Herrera Ezequiel",
+    "estado_laboral": "Activo",
+    "salario": 1311000,
+    "adeudado": 644000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n11",
+    "nombre": "Rios Hugo",
+    "estado_laboral": "Activo",
+    "salario": 1310000,
+    "adeudado": 655000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n12",
+    "nombre": "Fernando Borda",
+    "estado_laboral": "Activo",
+    "salario": 426000,
+    "adeudado": 190000,
+    "comentarios": "Se abona por quincena- Lo adeudado corresponde a la 2° de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n13",
+    "nombre": "Luis Villamizar",
+    "estado_laboral": "Activo",
+    "salario": 3498000,
+    "adeudado": 2844510,
+    "comentarios": "Lo adeudado corresponde a sobre mes de junio + sueldo por banco mes de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n14",
+    "nombre": "FLORES MARÍA LUZ",
+    "estado_laboral": "Activo",
+    "salario": 2118125,
+    "adeudado": 1673625,
+    "comentarios": "Lo adeudado corresponde a sobre mes de junio + sueldo por banco mes de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n15",
+    "nombre": "MARTINEZ MARIANO",
+    "estado_laboral": "Activo",
+    "salario": 2223000,
+    "adeudado": 1618500,
+    "comentarios": "Lo adeudado corresponde a sobre mes de junio + sueldo por banco  + honorarios mes de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n16",
+    "nombre": "TERRADAS CARTA MARGARITA",
+    "estado_laboral": "Activo",
+    "salario": 2364869,
+    "adeudado": 1629369,
+    "comentarios": "Lo adeudado corresponde a sobre mes de junio + sueldo por banco  + mes de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n17",
+    "nombre": "TIBERI GUIDO",
+    "estado_laboral": "Activo",
+    "salario": 2300000,
+    "adeudado": 1238904,
+    "comentarios": "Lo adeudado corresponde a sobre mes de junio + sueldo blanco+ mes de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n18",
+    "nombre": "GUYOT MAXIMILIANO",
+    "estado_laboral": "Activo",
+    "salario": 100063,
+    "adeudado": 814763,
+    "comentarios": "Lo adeudado corresponde a sobre mes de junio + sueldo por banco  + mes de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n19",
+    "nombre": "RISIGLIONE VALERIA",
+    "estado_laboral": "Activo",
+    "salario": 455000,
+    "adeudado": 227500,
+    "comentarios": "Lo adeudado corresponde a sobre mes de junio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n20",
+    "nombre": "SUAREZ SIXTO",
+    "estado_laboral": "Activo",
+    "salario": 2013000,
+    "adeudado": 1567000,
+    "comentarios": "Lo adeudado corresponde a sobre mes de junio + honorarios+ mes de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n21",
+    "nombre": "MARELLI LUCA",
+    "estado_laboral": "Activo",
+    "salario": 1580000,
+    "adeudado": 790000,
+    "comentarios": "Lo adeudado corresponde a sobre mes de junio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n22",
+    "nombre": "MILAGROS SALTEÑO",
+    "estado_laboral": "Activo",
+    "salario": 1246000,
+    "adeudado": 1192395,
+    "comentarios": "Lo adeudado corresponde a sobre mes de junio + sueldo por banco  + mes de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n23",
+    "nombre": "NICOLAS DE FRANCESCO",
+    "estado_laboral": "De baja",
+    "salario": 2200000,
+    "adeudado": 2000000,
+    "comentarios": "Lo adeudado corresponde a honorarios mes de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n24",
+    "nombre": "ALEXANDER DATE",
+    "estado_laboral": "Activo",
+    "salario": 500000,
+    "adeudado": 250000,
+    "comentarios": "Lo adeudado corresponde a sobre de junio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n25",
+    "nombre": "RAUL",
+    "estado_laboral": "Activo",
+    "salario": 2000000,
+    "adeudado": 3000000,
+    "comentarios": "Lo adeudadod coresponde a sobre mayo y junio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n26",
+    "nombre": "ECHEVERRÍA JUAN PABLO",
+    "estado_laboral": "Activo/ De baja desde firma y homologacion de acuerdo laboral",
+    "salario": 0,
+    "adeudado": 0,
+    "comentarios": "Sin goce",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "n27",
+    "nombre": "HORACIO MARTINEZ",
+    "estado_laboral": "Activo/ De baja con posterioridad al acuerdo de salida",
+    "salario": 1631259,
+    "adeudado": 1631259,
+    "comentarios": "Lo adeudadod coresponde a sueldo banco mes de julio",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  }
+];
+
+  var DISPONIBILIDAD_ARS = 26250000.00;
+
+  var TABS = {
+    pagos: {
+      label:"Pagos", titleField:"compromiso",
+      fields:["compromiso","importe","fecha","abonar","razon_si","razon_no","aclaracion","criterio","estado","abonos","observacion"],
+      importMap:[["compromiso","Compromiso"],["importe","Importe"],["fecha","Fecha"],["abonar","Abonar"],["razon_si","Razon_si"],["razon_no","Razon_no"],["aclaracion","Aclaracion"],["criterio","Criterio"]],
+      newRow:function(){ return {id:"p_"+Date.now()+Math.random(), compromiso:"Nuevo compromiso", importe:0, fecha:"", abonar:0, razon_si:"", razon_no:"", aclaracion:"", criterio:"", estado:"pendiente", abonos:[], observacion:""}; }
+    },
+    ingresos: {
+      label:"Ingresos", titleField:"nombre",
+      fields:["nro","nombre","proyecto","empresa","concepto","moneda","importe","fecha","fecha_pago","criterio","observacion"],
+      importMap:[["nro","Nro"],["nombre","Nombre"],["proyecto","Proyecto"],["empresa","Empresa"],["concepto","Concepto"],["moneda","Moneda"],["importe","Importe"],["fecha","Fecha"],["fecha_pago","Fecha Pago"],["criterio","Criterio"]],
+      newRow:function(){ return {id:"i_"+Date.now()+Math.random(), nro:"", nombre:"Nuevo cliente", proyecto:"", empresa:"", concepto:"", moneda:"Pesos", importe:0, fecha:"", fecha_pago:"", criterio:"", observacion:""}; }
+    },
+    nominas: {
+      label:"Nóminas", titleField:"nombre",
+      fields:["nombre","estado_laboral","salario","adeudado","criterio","estado","abonos","comentarios"],
+      importMap:[["nombre","Nombre"],["estado_laboral","Estado"],["salario","Salario_mensual"],["adeudado","Adeudado"],["criterio","Criterio"],["comentarios","Comentarios"]],
+      newRow:function(){ return {id:"n_"+Date.now()+Math.random(), nombre:"Nueva persona", estado_laboral:"Activo", salario:0, adeudado:0, criterio:"", estado:"pendiente", abonos:[], comentarios:""}; }
+    }
+  };
+
+  var storageBroken = false;
+  try{
+    var _probeKey = STORAGE_KEY + "__probe";
+    localStorage.setItem(_probeKey, "1");
+    if(localStorage.getItem(_probeKey) !== "1") storageBroken = true;
+    localStorage.removeItem(_probeKey);
+  }catch(e){ storageBroken = true; }
+
+  var state = load();
+
+  function defaultState(){
+    return {
+      activeTab:"pagos",
+      pagos:{rows: DEFAULT_PAGOS.map(function(r){ return Object.assign({}, r); })},
+      ingresos:{rows: DEFAULT_INGRESOS.map(function(r){ return Object.assign({}, r); })},
+      nominas:{rows: DEFAULT_NOMINAS.map(function(r){ return Object.assign({}, r); })},
+      updatedAt:null
+    };
+  }
+
+  function migrateV1(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY_V1);
+      if(!raw) return null;
+      var old = JSON.parse(raw);
+      var s = defaultState();
+      s.pagos.rows = old.rows.map(function(r){
+        return {
+          id:r.id, compromiso:r.compromiso, importe:r.importe, fecha:r.fecha, abonar:r.abonar,
+          razon_si:r.razon_si||"", razon_no:r.razon_no||"", aclaracion:r.aclaracion||"", criterio:"",
+          estado:r.estado||"pendiente",
+          abonos: (r.estado==="parcial" && r.monto) ? [{fecha:"", monto:r.monto}] : [],
+          observacion:r.observacion||""
+        };
+      });
+      return s;
+    }catch(e){ return null; }
+  }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var s = JSON.parse(raw);
+        // el esquema de Ingresos cambió (ahora trae los datos reales de cobros): si lo guardado
+        // es el placeholder vacío o el esquema viejo, se reemplaza por los datos por defecto.
+        if(!s.ingresos || !s.ingresos.rows || !s.ingresos.rows.length || s.ingresos.rows[0].nombre === undefined){
+          s.ingresos = {rows: DEFAULT_INGRESOS.map(function(r){ return Object.assign({}, r); })};
+        }
+        // si alguna solapa quedó en cero filas (se borró todo, se pegó un CSV vacío, etc.)
+        // se repone con los datos de origen en vez de mostrar la tabla vacía para siempre.
+        if(!s.pagos || !s.pagos.rows || !s.pagos.rows.length){
+          s.pagos = {rows: DEFAULT_PAGOS.map(function(r){ return Object.assign({}, r); })};
+        }
+        if(!s.nominas || !s.nominas.rows || !s.nominas.rows.length){
+          s.nominas = {rows: DEFAULT_NOMINAS.map(function(r){ return Object.assign({}, r); })};
+        }
+        return s;
+      }
+    }catch(e){}
+    return migrateV1() || defaultState();
+  }
+
+  function save(){
+    state.updatedAt = new Date().toISOString();
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      storageBroken = false;
+    }catch(e){
+      storageBroken = true;
+    }
+    renderFooter();
+    updateStorageWarning();
+  }
+
+  function updateStorageWarning(){
+    var el = document.getElementById("storageWarning");
+    if(!el) return;
+    el.style.display = storageBroken ? "flex" : "none";
+  }
+
+  function money(n){
+    if(n === null || n === undefined || isNaN(n)) return "—";
+    return "$ " + Number(n).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function esc(s){
+    return (s===null||s===undefined?"":String(s)).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function abonosSum(row){ return (row.abonos||[]).reduce(function(s,a){ return s + (Number(a.monto)||0); }, 0); }
+  function montoPagado(row, importeField){
+    if(row.estado === "hecho") return row[importeField];
+    if(row.estado === "parcial") return abonosSum(row);
+    return 0;
+  }
+
+  // ---------- render ----------
+  function render(){
+    renderTabsNav();
+    renderPagos();
+    renderIngresos();
+    renderNominas();
+    renderFooter();
+    renderIoLabel();
+  }
+
+  function renderTabsNav(){
+    document.querySelectorAll("nav.tabs button").forEach(function(b){
+      b.setAttribute("aria-current", b.dataset.tab === state.activeTab ? "true" : "false");
+    });
+    document.querySelectorAll(".tabpanel").forEach(function(p){
+      p.setAttribute("data-visible", p.dataset.tab === state.activeTab ? "true" : "false");
+    });
+  }
+
+  function renderIoLabel(){
+    document.getElementById("ioTabName").textContent = TABS[state.activeTab].label;
+    var notes = {
+      pagos:"Compromiso, Importe, Fecha, Abonar, Razon_si, Razon_no, Aclaracion, Criterio. Podés pegar texto, subir un .csv o un .xlsx (primera hoja). Los .pdf hay que pasarlos primero a Excel.",
+      ingresos:"Nro, Nombre, Proyecto, Empresa, Concepto, Moneda, Importe, Fecha, Fecha Pago, Criterio. Podés pegar texto, subir un .csv o un .xlsx.",
+      nominas:"Nombre, Estado, Salario_mensual, Adeudado, Criterio, Comentarios. Podés pegar texto, subir un .csv o un .xlsx."
+    };
+    document.getElementById("ioNote").textContent = notes[state.activeTab];
+  }
+
+  function segButtons(row, tabKey, i, labels){
+    labels = labels || ["Hecho","Parcial","No hecho"];
+    return '<div class="seg" role="group" aria-label="Estado">'
+      + '<button type="button" class="b-hecho" data-tab="'+tabKey+'" data-i="'+i+'" data-action="estado" data-val="hecho" aria-pressed="'+(row.estado==="hecho")+'">'+labels[0]+'</button>'
+      + '<button type="button" class="b-parcial" data-tab="'+tabKey+'" data-i="'+i+'" data-action="estado" data-val="parcial" aria-pressed="'+(row.estado==="parcial")+'">'+labels[1]+'</button>'
+      + '<button type="button" class="b-no" data-tab="'+tabKey+'" data-i="'+i+'" data-action="estado" data-val="no_hecho" aria-pressed="'+(row.estado==="no_hecho")+'">'+labels[2]+'</button>'
+      + '</div>';
+  }
+
+  function abonosBlock(row, tabKey, i){
+    if(row.estado !== "parcial") return "";
+    var list = (row.abonos||[]).map(function(a, ai){
+      return '<div class="abono-row">'
+        + '<input type="text" data-tab="'+tabKey+'" data-i="'+i+'" data-ai="'+ai+'" data-action="abono-fecha" value="'+esc(a.fecha)+'" placeholder="fecha" />'
+        + '<input type="number" step="0.01" data-tab="'+tabKey+'" data-i="'+i+'" data-ai="'+ai+'" data-action="abono-monto" value="'+a.monto+'" />'
+        + '<button type="button" class="abono-del" data-tab="'+tabKey+'" data-i="'+i+'" data-ai="'+ai+'" data-action="abono-del" title="Quitar abono">×</button>'
+        + '</div>';
+    }).join("");
+    return '<div class="abonos">' + list
+      + '<button type="button" class="add-abono" data-tab="'+tabKey+'" data-i="'+i+'" data-action="abono-add">+ agregar abono</button>'
+      + '<div class="abonos-total">Abonado: '+money(abonosSum(row))+'</div>'
+      + '</div>';
+  }
+
+  function renderPagos(){
+    var rows = state.pagos.rows;
+    var tbody = document.getElementById("rowsPagos");
+    tbody.innerHTML = rows.map(function(r, i){
+      var motivo = '<div class="motivo-cell">'
+        + '<input type="text" class="motivo-input si text-input" data-tab="pagos" data-i="'+i+'" data-action="razon_si" value="'+esc(r.razon_si)+'" placeholder="Sí: motivo..." />'
+        + '<input type="text" class="motivo-input no text-input" data-tab="pagos" data-i="'+i+'" data-action="razon_no" value="'+esc(r.razon_no)+'" placeholder="No: motivo..." />'
+        + '<input type="text" class="motivo-input acl text-input" data-tab="pagos" data-i="'+i+'" data-action="aclaracion" value="'+esc(r.aclaracion)+'" placeholder="Aclaración..." />'
+        + '</div>';
+      return '<tr data-estado="'+r.estado+'">'
+        + '<td><input type="text" class="text-input" data-tab="pagos" data-i="'+i+'" data-action="compromiso" value="'+esc(r.compromiso)+'" /></td>'
+        + '<td><input type="number" step="0.01" class="num-input num" data-tab="pagos" data-i="'+i+'" data-action="importe" value="'+r.importe+'" /></td>'
+        + '<td><input type="text" class="text-input fecha-cell" style="width:5rem" data-tab="pagos" data-i="'+i+'" data-action="fecha" value="'+esc(r.fecha)+'" /></td>'
+        + '<td class="num">'+money(r.abonar)+'</td>'
+        + '<td>'+motivo+'</td>'
+        + '<td><input type="text" class="text-input" data-tab="pagos" data-i="'+i+'" data-action="criterio" value="'+esc(r.criterio)+'" placeholder="Criterio..." /></td>'
+        + '<td class="estado-cell">'+segButtons(r,"pagos",i)+abonosBlock(r,"pagos",i)+'</td>'
+        + '<td><input type="text" class="text-input" data-tab="pagos" data-i="'+i+'" data-action="observacion" value="'+esc(r.observacion)+'" placeholder="Observación..." /></td>'
+        + '<td><button type="button" class="del-btn" data-tab="pagos" data-i="'+i+'" data-action="del" title="Eliminar">🗑</button></td>'
+        + '</tr>';
+    }).join("");
+
+    var totalImporte = rows.reduce(function(s,r){ return s+r.importe; },0);
+    var totalPlan = rows.reduce(function(s,r){ return s+r.abonar; },0);
+    var pagadoReal = rows.reduce(function(s,r){ return s+montoPagado(r,"importe"); },0);
+    var comprometidoRestante = totalImporte - pagadoReal;
+    var pendiente = rows.filter(function(r){ return r.estado==="pendiente"; }).length;
+    var restante = DISPONIBILIDAD_ARS - pagadoReal;
+    document.getElementById("statsPagos").innerHTML = [
+      {label:"Total comprometido", val:money(comprometidoRestante), cls:""},
+      {label:"Plan a abonar", val:money(totalPlan), cls:""},
+      {label:"Marcado hecho + parcial", val:money(pagadoReal), cls:"good"},
+      {label:"Pendiente de tildar", val:pendiente+" de "+rows.length, cls:"warning"},
+      {label:"Disponibilidad restante", val:money(restante), cls:"accent"}
+    ].map(statCard).join("");
+  }
+
+  function isUSD(moneda){ return /d[oó]lar|usd/i.test(moneda||""); }
+
+  function ingresosStatsHtml(rows){
+    var usdRows = rows.filter(function(r){ return isUSD(r.moneda); });
+    var arsRows = rows.filter(function(r){ return !isUSD(r.moneda); });
+    var pendUSD = usdRows.reduce(function(s,r){ return s + r.importe; },0);
+    var pendARS = arsRows.reduce(function(s,r){ return s + r.importe; },0);
+    return [
+      {label:"Pendiente de cobro (USD)", val:"US$ "+Number(pendUSD).toLocaleString("en-US",{minimumFractionDigits:2}), cls:""},
+      {label:"Pendiente de cobro (ARS)", val:money(pendARS), cls:""},
+      {label:"Conceptos cargados", val:String(rows.length), cls:""}
+    ].map(statCard).join("");
+  }
+
+  function renderIngresos(){
+    var rows = state.ingresos.rows;
+    var tbody = document.getElementById("rowsIngresos");
+    tbody.innerHTML = rows.map(function(r, i){
+      return '<tr>'
+        + '<td class="fecha-cell">'+esc(r.nro)+'</td>'
+        + '<td><input type="text" class="text-input" data-tab="ingresos" data-i="'+i+'" data-action="nombre" value="'+esc(r.nombre)+'" /></td>'
+        + '<td><input type="text" class="text-input" data-tab="ingresos" data-i="'+i+'" data-action="proyecto" value="'+esc(r.proyecto)+'" /></td>'
+        + '<td><input type="text" class="text-input" style="width:6rem" data-tab="ingresos" data-i="'+i+'" data-action="empresa" value="'+esc(r.empresa)+'" /></td>'
+        + '<td><input type="text" class="text-input" style="width:7rem" data-tab="ingresos" data-i="'+i+'" data-action="concepto" value="'+esc(r.concepto)+'" /></td>'
+        + '<td><input type="text" class="text-input" style="width:5.5rem" data-tab="ingresos" data-i="'+i+'" data-action="moneda" value="'+esc(r.moneda)+'" /></td>'
+        + '<td><input type="number" step="0.01" class="num-input num" data-tab="ingresos" data-i="'+i+'" data-action="importe" value="'+r.importe+'" /></td>'
+        + '<td><input type="text" class="text-input fecha-cell" style="width:5.5rem" data-tab="ingresos" data-i="'+i+'" data-action="fecha" value="'+esc(r.fecha)+'" /></td>'
+        + '<td><input type="text" class="text-input fecha-cell" style="width:5.5rem" data-tab="ingresos" data-i="'+i+'" data-action="fecha_pago" value="'+esc(r.fecha_pago)+'" placeholder="—" /></td>'
+        + '<td><input type="text" class="text-input" data-tab="ingresos" data-i="'+i+'" data-action="criterio" value="'+esc(r.criterio)+'" placeholder="Criterio..." /></td>'
+        + '<td><input type="text" class="text-input" data-tab="ingresos" data-i="'+i+'" data-action="observacion" value="'+esc(r.observacion)+'" placeholder="Observación..." /></td>'
+        + '<td><button type="button" class="del-btn" data-tab="ingresos" data-i="'+i+'" data-action="del" title="Eliminar">🗑</button></td>'
+        + '</tr>';
+    }).join("");
+    document.getElementById("statsIngresos").innerHTML = ingresosStatsHtml(rows);
+  }
+
+  function renderNominas(){
+    var rows = state.nominas.rows;
+    var tbody = document.getElementById("rowsNominas");
+    tbody.innerHTML = rows.map(function(r, i){
+      return '<tr data-estado="'+r.estado+'">'
+        + '<td class="nombre-cell"><input type="text" class="text-input" data-tab="nominas" data-i="'+i+'" data-action="nombre" value="'+esc(r.nombre)+'" /></td>'
+        + '<td><input type="text" class="text-input" style="width:12rem" data-tab="nominas" data-i="'+i+'" data-action="estado_laboral" value="'+esc(r.estado_laboral)+'" /></td>'
+        + '<td><input type="number" step="0.01" class="num-input num" data-tab="nominas" data-i="'+i+'" data-action="salario" value="'+r.salario+'" /></td>'
+        + '<td><input type="number" step="0.01" class="num-input num" data-tab="nominas" data-i="'+i+'" data-action="adeudado" value="'+r.adeudado+'" /></td>'
+        + '<td><input type="text" class="text-input" data-tab="nominas" data-i="'+i+'" data-action="criterio" value="'+esc(r.criterio)+'" placeholder="Criterio..." /></td>'
+        + '<td class="estado-cell">'+segButtons(r,"nominas",i)+abonosBlock(r,"nominas",i)+'</td>'
+        + '<td><input type="text" class="text-input" style="width:14rem" data-tab="nominas" data-i="'+i+'" data-action="comentarios" value="'+esc(r.comentarios)+'" /></td>'
+        + '<td><button type="button" class="del-btn" data-tab="nominas" data-i="'+i+'" data-action="del" title="Eliminar">🗑</button></td>'
+        + '</tr>';
+    }).join("");
+    var totalSalario = rows.reduce(function(s,r){ return s+r.salario; },0);
+    var totalAdeudado = rows.reduce(function(s,r){ return s+r.adeudado; },0);
+    document.getElementById("statsNominas").innerHTML = [
+      {label:"Total salarios mensuales", val:money(totalSalario), cls:""},
+      {label:"Total adeudado", val:money(totalAdeudado), cls:"warning"},
+      {label:"Personas en nómina", val:String(rows.length), cls:""}
+    ].map(statCard).join("");
+  }
+
+  function statCard(c){
+    return '<div class="stat '+c.cls+'"><div class="label">'+c.label+'</div><div class="val">'+c.val+'</div></div>';
+  }
+
+  function renderFooter(){
+    var el = document.getElementById("lastUpdated");
+    if(!state.updatedAt){ el.textContent = "Guardado localmente en este navegador."; return; }
+    var d = new Date(state.updatedAt);
+    el.textContent = "Última edición: " + d.toLocaleString("es-AR");
+  }
+
+  // ---------- events ----------
+  document.getElementById("tabs").addEventListener("click", function(e){
+    var btn = e.target.closest("button[data-tab]");
+    if(!btn) return;
+    state.activeTab = btn.dataset.tab;
+    renderTabsNav(); renderIoLabel();
+    if(scrollSyncs[state.activeTab]) scrollSyncs[state.activeTab]();
+  });
+
+  // ---------- barra de scroll arriba de cada tabla, sincronizada con la real ----------
+  var scrollSyncs = {};
+  function setupScrollSync(tabKey, topId, mainId){
+    var top = document.getElementById(topId), main = document.getElementById(mainId);
+    if(!top || !main) return;
+    var spacer = top.firstElementChild;
+    var lock = false;
+    function sync(){
+      var table = main.querySelector("table");
+      spacer.style.width = (table ? table.scrollWidth : main.scrollWidth) + "px";
+    }
+    top.addEventListener("scroll", function(){ if(lock) return; lock=true; main.scrollLeft = top.scrollLeft; lock=false; });
+    main.addEventListener("scroll", function(){ if(lock) return; lock=true; top.scrollLeft = main.scrollLeft; lock=false; });
+    scrollSyncs[tabKey] = sync;
+    sync();
+  }
+
+  document.querySelectorAll(".add-row-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var tab = btn.dataset.add;
+      state[tab].rows.push(TABS[tab].newRow());
+      save();
+      if(tab==="pagos") renderPagos();
+      if(tab==="ingresos") renderIngresos();
+      if(tab==="nominas") renderNominas();
+    });
+  });
+
+  document.body.addEventListener("click", function(e){
+    var btn = e.target.closest("button[data-action]");
+    if(!btn) return;
+    var tab = btn.dataset.tab, i = +btn.dataset.i, action = btn.dataset.action;
+    if(!tab || !TABS[tab]) return;
+    var row = state[tab].rows[i];
+    if(!row) return;
+
+    if(action === "estado"){
+      var val = btn.dataset.val;
+      row.estado = (row.estado === val) ? "pendiente" : val;
+      if(row.estado === "parcial" && (!row.abonos || !row.abonos.length)) row.abonos = [{fecha:"", monto:0}];
+    } else if(action === "del"){
+      state[tab].rows.splice(i,1);
+    } else if(action === "abono-add"){
+      row.abonos = row.abonos || [];
+      row.abonos.push({fecha:"", monto:0});
+    } else if(action === "abono-del"){
+      row.abonos.splice(+btn.dataset.ai, 1);
+    } else {
+      return;
+    }
+    save();
+    if(tab==="pagos") renderPagos();
+    if(tab==="ingresos") renderIngresos();
+    if(tab==="nominas") renderNominas();
+  });
+
+  document.body.addEventListener("input", function(e){
+    var t = e.target;
+    var tab = t.dataset.tab, i = t.dataset.i, action = t.dataset.action;
+    if(!tab || i === undefined || !TABS[tab]) return;
+    i = +i;
+    var row = state[tab].rows[i];
+    if(!row) return;
+    var numericFields = {importe:1, abonar:1, salario:1, adeudado:1};
+
+    if(action === "abono-fecha"){ row.abonos[+t.dataset.ai].fecha = t.value; save(); return; }
+    if(action === "abono-monto"){ row.abonos[+t.dataset.ai].monto = parseFloat(t.value)||0; save(); recalcStatsOnly(tab); return; }
+
+    row[action] = numericFields[action] ? (parseFloat(t.value)||0) : t.value;
+    save();
+    recalcStatsOnly(tab);
+  });
+
+  function recalcStatsOnly(tab){
+    if(tab==="pagos"){
+      var rows = state.pagos.rows;
+      var totalImporte = rows.reduce(function(s,r){ return s+r.importe; },0);
+      var totalPlan = rows.reduce(function(s,r){ return s+r.abonar; },0);
+      var pagadoReal = rows.reduce(function(s,r){ return s+montoPagado(r,"importe"); },0);
+      var comprometidoRestante = totalImporte - pagadoReal;
+      var pendiente = rows.filter(function(r){ return r.estado==="pendiente"; }).length;
+      var restante = DISPONIBILIDAD_ARS - pagadoReal;
+      document.getElementById("statsPagos").innerHTML = [
+        {label:"Total comprometido", val:money(comprometidoRestante), cls:""},
+        {label:"Plan a abonar", val:money(totalPlan), cls:""},
+        {label:"Marcado hecho + parcial", val:money(pagadoReal), cls:"good"},
+        {label:"Pendiente de tildar", val:pendiente+" de "+rows.length, cls:"warning"},
+        {label:"Disponibilidad restante", val:money(restante), cls:"accent"}
+      ].map(statCard).join("");
+    } else if(tab==="ingresos"){
+      document.getElementById("statsIngresos").innerHTML = ingresosStatsHtml(state.ingresos.rows);
+    } else if(tab==="nominas"){
+      var r3 = state.nominas.rows;
+      var ts = r3.reduce(function(s,r){ return s+r.salario; },0);
+      var ta = r3.reduce(function(s,r){ return s+r.adeudado; },0);
+      document.getElementById("statsNominas").innerHTML = [
+        {label:"Total salarios mensuales", val:money(ts), cls:""},
+        {label:"Total adeudado", val:money(ta), cls:"warning"},
+        {label:"Personas en nómina", val:String(r3.length), cls:""}
+      ].map(statCard).join("");
+    }
+  }
+
+  // ---------- .xlsx reading (no libraries: native ZIP + XML parsing) ----------
+  function colLettersToIndex(letters){
+    var idx = 0;
+    for(var i=0; i<letters.length; i++) idx = idx*26 + (letters.charCodeAt(i) - 64);
+    return idx - 1;
+  }
+
+  async function xlsxToRowsText(arrayBuffer){
+    var buf = new Uint8Array(arrayBuffer);
+    var dv = new DataView(arrayBuffer);
+
+    var eocdOffset = -1;
+    var searchStart = Math.max(0, buf.length - 22 - 65557);
+    for(var i = buf.length - 22; i >= searchStart; i--){
+      if(dv.getUint32(i, true) === 0x06054b50){ eocdOffset = i; break; }
+    }
+    if(eocdOffset < 0) throw new Error("no es un .xlsx válido (no se encontró el índice ZIP)");
+
+    var totalEntries = dv.getUint16(eocdOffset + 10, true);
+    var centralDirOffset = dv.getUint32(eocdOffset + 16, true);
+
+    var entries = {};
+    var p = centralDirOffset;
+    for(var e = 0; e < totalEntries; e++){
+      if(dv.getUint32(p, true) !== 0x02014b50) break;
+      var method = dv.getUint16(p+10, true);
+      var compSize = dv.getUint32(p+20, true);
+      var nameLen = dv.getUint16(p+28, true);
+      var extraLen = dv.getUint16(p+30, true);
+      var commentLen = dv.getUint16(p+32, true);
+      var localOffset = dv.getUint32(p+42, true);
+      var name = new TextDecoder().decode(buf.subarray(p+46, p+46+nameLen));
+      entries[name] = {offset:localOffset, compSize:compSize, method:method};
+      p += 46 + nameLen + extraLen + commentLen;
+    }
+
+    async function readEntry(name){
+      var meta = entries[name];
+      if(!meta) return null;
+      var lp = meta.offset;
+      var lNameLen = dv.getUint16(lp+26, true);
+      var lExtraLen = dv.getUint16(lp+28, true);
+      var dataStart = lp + 30 + lNameLen + lExtraLen;
+      var compData = buf.subarray(dataStart, dataStart + meta.compSize);
+      if(meta.method === 0) return compData;
+      if(meta.method === 8){
+        var stream = new Blob([compData]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+        return new Uint8Array(await new Response(stream).arrayBuffer());
+      }
+      throw new Error("método de compresión ZIP no soportado (" + meta.method + ")");
+    }
+
+    var sharedBytes = await readEntry("xl/sharedStrings.xml");
+    var sheetBytes = await readEntry("xl/worksheets/sheet1.xml");
+    if(!sheetBytes) throw new Error("no se encontró la primera hoja dentro del .xlsx");
+
+    var parser = new DOMParser();
+    var sharedStrings = [];
+    if(sharedBytes){
+      var ssXml = parser.parseFromString(new TextDecoder("utf-8").decode(sharedBytes), "application/xml");
+      sharedStrings = Array.from(ssXml.getElementsByTagName("si")).map(function(si){
+        return Array.from(si.getElementsByTagName("t")).map(function(t){ return t.textContent; }).join("");
+      });
+    }
+
+    var sheetXml = parser.parseFromString(new TextDecoder("utf-8").decode(sheetBytes), "application/xml");
+    var rows = Array.from(sheetXml.getElementsByTagName("row")).map(function(rowEl){
+      var cellMap = {}, maxCol = 0;
+      Array.from(rowEl.getElementsByTagName("c")).forEach(function(c){
+        var ref = (c.getAttribute("r") || "").replace(/[0-9]/g, "");
+        var colIdx = ref ? colLettersToIndex(ref) : 0;
+        maxCol = Math.max(maxCol, colIdx);
+        var type = c.getAttribute("t");
+        var vEl = c.getElementsByTagName("v")[0];
+        var val = "";
+        if(type === "s") val = sharedStrings[parseInt(vEl ? vEl.textContent : "0", 10)] || "";
+        else if(type === "inlineStr"){ var isEl = c.getElementsByTagName("is")[0]; val = isEl ? isEl.textContent : ""; }
+        else val = vEl ? vEl.textContent : "";
+        cellMap[colIdx] = val;
+      });
+      var arr = [];
+      for(var ci=0; ci<=maxCol; ci++) arr.push(cellMap[ci] !== undefined ? cellMap[ci] : "");
+      return arr.join("\t");
+    });
+    return rows.join("\n");
+  }
+
+  // ---------- import / export ----------
+  function parseDelimited(text, tabKey){
+    var cfg = TABS[tabKey];
+    var lines = text.trim().split(/\r?\n/).filter(Boolean);
+    if(!lines.length) return [];
+    var delim = lines[0].indexOf("\t") >= 0 ? "\t" : ",";
+    var header = lines[0].split(delim).map(function(h){ return h.trim().toLowerCase(); });
+    var rows = [];
+    for(var li=1; li<lines.length; li++){
+      var cells = lines[li].split(delim);
+      var norm = function(s){ return String(s).toLowerCase().replace(/[^a-z0-9]/g,""); };
+      var get = function(label, idx){
+        var nlabel = norm(label);
+        var exactIdx = -1, subIdx = -1;
+        for(var hj=0; hj<header.length; hj++){
+          var nh = norm(header[hj]);
+          if(nh === nlabel){ exactIdx = hj; break; }
+          if(subIdx<0 && (nh.indexOf(nlabel)>=0 || nlabel.indexOf(nh)>=0)) subIdx = hj;
+        }
+        var hi = exactIdx>=0 ? exactIdx : subIdx;
+        if(hi>=0) return (cells[hi]||"").trim();
+        // sin match por nombre de columna: solo la primera columna (nombre/concepto/compromiso) cae por posición
+        if(idx===0) return (cells[0]||"").trim();
+        return "";
+      };
+      var num = function(s){ return parseFloat(String(s).replace(/[^0-9.-]/g,"")) || 0; };
+      var row = cfg.newRow();
+      cfg.importMap.forEach(function(pair, idx){
+        var key = pair[0], label = pair[1];
+        var raw = get(label, idx);
+        row[key] = (key==="importe"||key==="abonar"||key==="salario"||key==="adeudado") ? num(raw) : raw;
+      });
+      row.estado = "pendiente"; row.abonos = [];
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  document.getElementById("btnImportPaste").addEventListener("click", function(){
+    var text = document.getElementById("pasteArea").value;
+    var msg = document.getElementById("importMsg");
+    var tab = state.activeTab;
+    var parsed = parseDelimited(text, tab);
+    if(!parsed.length){ msg.style.color="var(--critical)"; msg.textContent = "No se detectaron filas."; return; }
+    state[tab].rows = parsed;
+    save();
+    if(tab==="pagos") renderPagos();
+    if(tab==="ingresos") renderIngresos();
+    if(tab==="nominas") renderNominas();
+    msg.style.color = "var(--good)";
+    msg.textContent = "Tabla de " + TABS[tab].label + " reemplazada con " + parsed.length + " fila(s).";
+  });
+
+  document.getElementById("fileInput").addEventListener("change", async function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var msg = document.getElementById("importMsg");
+    try{
+      var text;
+      if(/\.xlsx$/i.test(file.name)){
+        msg.style.color = "var(--ink-soft)"; msg.textContent = "Leyendo .xlsx...";
+        text = await xlsxToRowsText(await file.arrayBuffer());
+      } else {
+        text = await file.text();
+      }
+      document.getElementById("pasteArea").value = text;
+      document.getElementById("btnImportPaste").click();
+    }catch(err){
+      msg.style.color = "var(--critical)";
+      msg.textContent = "No se pudo leer el archivo: " + err.message;
+    }
+  });
+
+  document.getElementById("btnExport").addEventListener("click", function(){
+    var msg = document.getElementById("exportMsg");
+    var tab = state.activeTab;
+    var cfg = TABS[tab];
+    var header = cfg.importMap.map(function(p){ return p[1]; });
+    if(cfg.fields.indexOf("estado")>=0) header = header.concat(["Estado","Monto_pagado"]);
+    var lines = [header.join(",")];
+    state[tab].rows.forEach(function(r){
+      var vals = cfg.importMap.map(function(p){ return r[p[0]]; });
+      if(cfg.fields.indexOf("estado")>=0){
+        var importeField = tab==="nominas" ? "adeudado" : "importe";
+        vals = vals.concat([r.estado, montoPagado(r, importeField)]);
+      }
+      lines.push(vals.map(function(v){ return '"' + String(v===undefined||v===null?"":v).replace(/"/g,'""') + '"'; }).join(","));
+    });
+    var csv = lines.join("\n");
+    var filename = "panel_" + tab + "_" + new Date().toISOString().slice(0,10) + ".csv";
+    var blob = new Blob([csv], {type:"text/csv"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    msg.style.color = "var(--ink-soft)"; msg.textContent = "Descargado.";
+  });
+
+  document.getElementById("btnReset").addEventListener("click", function(){
+    if(!confirm("Esto borra todos los cambios guardados (las 3 solapas) y vuelve a los datos originales. ¿Seguir?")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY_V1);
+    state = defaultState();
+    render();
+  });
+
+  render();
+  updateStorageWarning();
+  setupScrollSync("pagos", "scrollTopPagos", "tableScrollPagos");
+  setupScrollSync("ingresos", "scrollTopIngresos", "tableScrollIngresos");
+  setupScrollSync("nominas", "scrollTopNominas", "tableScrollNominas");
+  window.addEventListener("resize", function(){
+    Object.keys(scrollSyncs).forEach(function(k){ scrollSyncs[k](); });
+  });
+})();
+</script>
