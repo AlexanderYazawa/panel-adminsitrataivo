@@ -2833,6 +2833,7 @@ var stateDocRef = doc(db, "panel_state", "current");
 
     var sharedBytes = await readEntry("xl/sharedStrings.xml");
     var sheetBytes = await readEntry("xl/worksheets/sheet1.xml");
+    var stylesBytes = await readEntry("xl/styles.xml");
     if(!sheetBytes) throw new Error("no se encontró la primera hoja dentro del .xlsx");
 
     var parser = new DOMParser();
@@ -2842,6 +2843,33 @@ var stateDocRef = doc(db, "panel_state", "current");
       sharedStrings = Array.from(ssXml.getElementsByTagName("si")).map(function(si){
         return Array.from(si.getElementsByTagName("t")).map(function(t){ return t.textContent; }).join("");
       });
+    }
+
+    // detectar qué estilos de celda son formato fecha, para no mostrar el número de serie de Excel
+    var BUILTIN_DATE_FMTS = {14:1,15:1,16:1,17:1,18:1,19:1,20:1,21:1,22:1,45:1,46:1,47:1};
+    var cellStyleIsDate = []; // índice = valor del atributo s de la celda
+    if(stylesBytes){
+      var stylesXml = parser.parseFromString(new TextDecoder("utf-8").decode(stylesBytes), "application/xml");
+      var customDateFmt = {};
+      Array.from(stylesXml.getElementsByTagName("numFmt")).forEach(function(nf){
+        var id = parseInt(nf.getAttribute("numFmtId"), 10);
+        var code = (nf.getAttribute("formatCode") || "").toLowerCase();
+        if(/[ymdh]/.test(code) && !/general/.test(code)) customDateFmt[id] = true;
+      });
+      var cellXfsWrap = stylesXml.getElementsByTagName("cellXfs")[0];
+      if(cellXfsWrap){
+        cellStyleIsDate = Array.from(cellXfsWrap.getElementsByTagName("xf")).map(function(xf){
+          var id = parseInt(xf.getAttribute("numFmtId") || "0", 10);
+          return !!(BUILTIN_DATE_FMTS[id] || customDateFmt[id]);
+        });
+      }
+    }
+    function excelSerialToDateStr(serial){
+      var n = parseFloat(serial);
+      if(isNaN(n)) return serial;
+      var ms = Math.round((n - 25569) * 86400000); // 25569 = días entre 1899-12-30 y 1970-01-01
+      var d = new Date(ms);
+      return d.getUTCFullYear() + "-" + String(d.getUTCMonth()+1).padStart(2,"0") + "-" + String(d.getUTCDate()).padStart(2,"0");
     }
 
     var sheetXml = parser.parseFromString(new TextDecoder("utf-8").decode(sheetBytes), "application/xml");
@@ -2856,7 +2884,11 @@ var stateDocRef = doc(db, "panel_state", "current");
         var val = "";
         if(type === "s") val = sharedStrings[parseInt(vEl ? vEl.textContent : "0", 10)] || "";
         else if(type === "inlineStr"){ var isEl = c.getElementsByTagName("is")[0]; val = isEl ? isEl.textContent : ""; }
-        else val = vEl ? vEl.textContent : "";
+        else{
+          val = vEl ? vEl.textContent : "";
+          var styleIdx = parseInt(c.getAttribute("s") || "0", 10);
+          if(val && cellStyleIsDate[styleIdx]) val = excelSerialToDateStr(val);
+        }
         cellMap[colIdx] = val;
       });
       var arr = [];
