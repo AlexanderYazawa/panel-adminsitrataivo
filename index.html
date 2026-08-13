@@ -178,7 +178,7 @@
 
   <!-- ===== PAGOS ===== -->
   <div class="tabpanel" data-tab="pagos" data-visible="true">
-    <section class="stats" id="statsPagos"></section>
+    <section class="stats cols-4" id="statsPagos"></section>
 
     <section class="block">
       <div class="section-head">
@@ -204,8 +204,8 @@
       <div class="table-scroll" id="tableScrollPagos">
         <table>
           <thead><tr>
-            <th>Compromiso</th><th>Importe</th><th>Fecha</th><th>A abonar (plan)</th>
-            <th>Motivo</th><th>Criterio de decisión</th><th>Estado</th><th>Observación</th><th></th>
+            <th>Nro</th><th>Acreedor</th><th>Proyecto</th><th>Empresa</th><th>Tipo</th><th>Concepto</th><th>Moneda</th>
+            <th>Importe</th><th>Fecha</th><th>Fecha de pago</th><th>Criterio de decisión</th><th>Estado</th><th>Observación</th><th></th>
           </tr></thead>
           <tbody id="rowsPagos"></tbody>
         </table>
@@ -313,15 +313,993 @@ var stateDocRef = doc(db, "panel_state", "current");
   var STORAGE_KEY_V1 = "roma_panel_pagos_v1";
 
   var DEFAULT_PAGOS = [
-    {id:"cheque", compromiso:"Cheque", importe:11219784.00, fecha:"14-ago", abonar:11219784.00, razon_si:"Compromiso bancario ineludible", razon_no:"", aclaracion:"Cheque EPE", criterio:"", estado:"pendiente", abonos:[], observacion:""},
-    {id:"arca", compromiso:"ARCA - Roma", importe:9931409.00, fecha:"14-ago", abonar:4725254.00, razon_si:"Compromiso fiscal ineludible", razon_no:"", aclaracion:"Asesoramiento Ignacio (estudio contable): la caída de los planes de pago implica riesgo fiscal", criterio:"", estado:"pendiente", abonos:[], observacion:""},
-    {id:"agostina", compromiso:"Agostina", importe:3600000.00, fecha:"10-ago", abonar:300000.00, razon_si:"Solo parcial", razon_no:"", aclaracion:"Muestra de buena voluntad y apertura al diálogo por nuevo valor", criterio:"", estado:"pendiente", abonos:[], observacion:""},
-    {id:"sobre_junio", compromiso:"Sobre junio", importe:8269000.00, fecha:"10-jul", abonar:0, razon_si:"", razon_no:"No hay disponibilidad", aclaracion:"", criterio:"", estado:"pendiente", abonos:[], observacion:""},
-    {id:"sueldo_julio", compromiso:"Sueldo julio (banco)", importe:12820000.00, fecha:"6-ago", abonar:6410000.00, razon_si:"Asignación a Luis, Milagros, Maximiliano, Luz", razon_no:"Mariano, Margarita, Guido, Horacio", aclaracion:"Compromiso legal", criterio:"", estado:"pendiente", abonos:[], observacion:""},
-    {id:"jornales_julio", compromiso:"Jornales 2° julio", importe:7550000.00, fecha:"6-ago", abonar:3775000.00, razon_si:"7 días de atraso en el pago. Solo se devengará el 50%.", razon_no:"", aclaracion:"", criterio:"", estado:"pendiente", abonos:[], observacion:""},
-    {id:"honorarios_julio", compromiso:"Honorarios julio", importe:6137000.00, fecha:"10-ago", abonar:0, razon_si:"", razon_no:"No hay disponibilidad — se puede postergar", aclaracion:"", criterio:"", estado:"pendiente", abonos:[], observacion:""},
-    {id:"sobres_julio", compromiso:"Sobres Julio", importe:12820000.00, fecha:"10-ago", abonar:0, razon_si:"", razon_no:"Mariano, Sixto, Nicolás — hoy no contamos con disponibilidad", aclaracion:"", criterio:"", estado:"pendiente", abonos:[], observacion:""}
-  ];
+  {
+    "id": "p1",
+    "nro": 645,
+    "nombre": "Cabanellas y Cia S.A.C.I",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Mr Schwarz",
+    "operacion": "Facturas",
+    "concepto": "00002026 - CUOTA 16/24 - FECHA 15/8/26",
+    "moneda": "Dólares",
+    "importe": 1000,
+    "fecha": "2025-04-16",
+    "fecha_pago": "2026-08-10",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p2",
+    "nro": 2722,
+    "nombre": "PLANES DE PAGO AFIP",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "01682026 - Plan de pago AFIP Cuota Agosto",
+    "moneda": "Pesos",
+    "importe": 678012.96,
+    "fecha": "2025-07-03",
+    "fecha_pago": "2026-08-16",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p3",
+    "nro": 3724,
+    "nombre": "Gigli Raul",
+    "proyecto": "VITTA RIO - GENERAL LAGOS",
+    "empresa": "Mr Schwarz",
+    "operacion": "Facturas",
+    "concepto": "00000010 - Compra lote segun acuerdo",
+    "moneda": "Dólares",
+    "importe": 3600,
+    "fecha": "2025-12-29",
+    "fecha_pago": "2026-08-25",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p4",
+    "nro": 1423,
+    "nombre": "Comuna de Alvear",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "02772026 - Cuota 6/6 Convenio Alvear Ecopueblo",
+    "moneda": "Pesos",
+    "importe": 755923,
+    "fecha": "2026-02-27",
+    "fecha_pago": "2026-08-10",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p5",
+    "nro": 540,
+    "nombre": "MULTAS VARIAS DE TRANSITO",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "18082026 - Plan de pago cuota 5/10 AE274UX",
+    "moneda": "Pesos",
+    "importe": 46643.4,
+    "fecha": "2026-03-11",
+    "fecha_pago": "2026-08-10",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p6",
+    "nro": 2722,
+    "nombre": "PLANES DE PAGO AFIP",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "01682026 - Plan de PAgo Afip cuota Agosto 2026",
+    "moneda": "Pesos",
+    "importe": 1361386.34,
+    "fecha": "2026-03-16",
+    "fecha_pago": "2026-08-16",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p7",
+    "nro": 1,
+    "nombre": "Zelarus",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000735 - Abono mes de agosto Athan",
+    "moneda": "Pesos",
+    "importe": 709497,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-28",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p8",
+    "nro": 1,
+    "nombre": "Zelarus",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000736 - Abono mensual Karuna agosto",
+    "moneda": "Pesos",
+    "importe": 183920,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-28",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p9",
+    "nro": 119,
+    "nombre": "Seguro Rivadavia",
+    "proyecto": "EL NARANJO - IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "21082026 - Seguros Rivadavia",
+    "moneda": "Pesos",
+    "importe": 53217,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-20",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p10",
+    "nro": 119,
+    "nombre": "Seguro Rivadavia",
+    "proyecto": "ORIGENES - SOLDINI",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "20072026 - seguro Rivadavia",
+    "moneda": "Pesos",
+    "importe": 78611,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-20",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p11",
+    "nro": 119,
+    "nombre": "Seguro Rivadavia",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000004 - Seguros Rivadavia",
+    "moneda": "Pesos",
+    "importe": 61682,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-20",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p12",
+    "nro": 119,
+    "nombre": "Seguro Rivadavia",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000007 - Seguro Alfa Romeo",
+    "moneda": "Pesos",
+    "importe": 218199,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-20",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p13",
+    "nro": 119,
+    "nombre": "Seguro Rivadavia",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000010 - Responsabilidad civil oficinas",
+    "moneda": "Pesos",
+    "importe": 64343,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-20",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p14",
+    "nro": 119,
+    "nombre": "Seguro Rivadavia",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000013 - Seguro de vida",
+    "moneda": "Pesos",
+    "importe": 83458,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-20",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p15",
+    "nro": 119,
+    "nombre": "Seguro Rivadavia",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "25082026 - Seguros Rivadavia",
+    "moneda": "Pesos",
+    "importe": 58798,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-20",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p16",
+    "nro": 119,
+    "nombre": "Seguro Rivadavia",
+    "proyecto": "TIERRA DE AUTORES - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000016 - seguros rivadavia",
+    "moneda": "Pesos",
+    "importe": 68401,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-20",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p17",
+    "nro": 119,
+    "nombre": "Seguro Rivadavia",
+    "proyecto": "VITTA - GENERAL LAGOS",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "24082026 - Seguros Rivadavia",
+    "moneda": "Pesos",
+    "importe": 61682,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-20",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p18",
+    "nro": 426,
+    "nombre": "EPE energia de santa fe",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000003 - Oficinas Carballo",
+    "moneda": "Pesos",
+    "importe": 342965.66,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-24",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p19",
+    "nro": 720,
+    "nombre": "Demarchi",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00043526 - Alarma y monitoreo oficians carballo",
+    "moneda": "Pesos",
+    "importe": 230054.4,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-24",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p20",
+    "nro": 849,
+    "nombre": "Holy Water / Rodriguez Antonela",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000394 - Abono mes de agosto bidones de agua",
+    "moneda": "Pesos",
+    "importe": 35000,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-15",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p21",
+    "nro": 1405,
+    "nombre": "Jimena Fernanda Villalba -AGUA Y SODA",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000539 - Abono mes de agosto bidones de agua",
+    "moneda": "Pesos",
+    "importe": 149500,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-17",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p22",
+    "nro": 3722,
+    "nombre": "Telecom",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "09440774 - Lineas oficinas",
+    "moneda": "Pesos",
+    "importe": 86658.99,
+    "fecha": "2026-06-03",
+    "fecha_pago": "2026-08-14",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p23",
+    "nro": 3742,
+    "nombre": "Aricana",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Mr Schwarz",
+    "operacion": "Facturas",
+    "concepto": "00000001 - Cuota curso ingles Max corresp al mes de agosto",
+    "moneda": "Pesos",
+    "importe": 172000,
+    "fecha": "2026-06-16",
+    "fecha_pago": "2026-08-16",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p24",
+    "nro": 2722,
+    "nombre": "PLANES DE PAGO AFIP",
+    "proyecto": "NUEVA METROPOLIS SRL",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "12082026 - Plan 1372",
+    "moneda": "Pesos",
+    "importe": 407116.77,
+    "fecha": "2026-07-01",
+    "fecha_pago": "2026-08-12",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p25",
+    "nro": 2722,
+    "nombre": "PLANES DE PAGO AFIP",
+    "proyecto": "NUEVA METROPOLIS SRL",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "12082026 - Plan 1372",
+    "moneda": "Pesos",
+    "importe": 386894.22,
+    "fecha": "2026-07-01",
+    "fecha_pago": "2026-08-12",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p26",
+    "nro": 2722,
+    "nombre": "PLANES DE PAGO AFIP",
+    "proyecto": "NUEVA METROPOLIS SRL",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "12082026 - Plan 1372",
+    "moneda": "Pesos",
+    "importe": 307005.49,
+    "fecha": "2026-07-01",
+    "fecha_pago": "2026-08-12",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p27",
+    "nro": 2722,
+    "nombre": "PLANES DE PAGO AFIP",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000001 - Plan de pago AFIP v410673 CUOTA 8",
+    "moneda": "Pesos",
+    "importe": 1364541.26,
+    "fecha": "2026-07-01",
+    "fecha_pago": "2026-08-16",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p28",
+    "nro": 2722,
+    "nombre": "PLANES DE PAGO AFIP",
+    "proyecto": "TIERRA DE AUTORES - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "12082026 - Plan de pago V130121",
+    "moneda": "Pesos",
+    "importe": 1417571.95,
+    "fecha": "2026-07-01",
+    "fecha_pago": "2026-08-12",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p29",
+    "nro": 2722,
+    "nombre": "PLANES DE PAGO AFIP",
+    "proyecto": "TIERRA DE AUTORES - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "12082026 - Plan de pago V130121",
+    "moneda": "Pesos",
+    "importe": 1382364.7,
+    "fecha": "2026-07-01",
+    "fecha_pago": "2026-08-12",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p30",
+    "nro": 2722,
+    "nombre": "PLANES DE PAGO AFIP",
+    "proyecto": "VRA Consulting",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "26082026 - Plan V822056",
+    "moneda": "Pesos",
+    "importe": 754154.17,
+    "fecha": "2026-07-01",
+    "fecha_pago": "2026-08-26",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p31",
+    "nro": 2722,
+    "nombre": "PLANES DE PAGO AFIP",
+    "proyecto": "VRA Consulting",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "26082026 - Plan V882068",
+    "moneda": "Pesos",
+    "importe": 1035276.53,
+    "fecha": "2026-07-01",
+    "fecha_pago": "2026-08-26",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p32",
+    "nro": 398,
+    "nombre": "AFIP - Cargas sociales F931",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "06082026 - F931 MES JUNIO 2026",
+    "moneda": "Pesos",
+    "importe": 6480825.09,
+    "fecha": "2026-07-14",
+    "fecha_pago": "2026-08-06",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p33",
+    "nro": 154,
+    "nombre": "Petri Emanuel",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000408 - Amojonamiento lote 255 CEPE",
+    "moneda": "Pesos",
+    "importe": 995220,
+    "fecha": "2026-07-28",
+    "fecha_pago": "2026-08-05",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p34",
+    "nro": 154,
+    "nombre": "Petri Emanuel",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000409 - Amojonamiento lotes 368 y 213 CEPE",
+    "moneda": "Pesos",
+    "importe": 1990440,
+    "fecha": "2026-07-28",
+    "fecha_pago": "2026-08-05",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p35",
+    "nro": 381,
+    "nombre": "AEC - ASOCIACION EMPLEADOS DE COMERCIO ROSARIO",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000001 - CUOTA 1 de meses adeudado AEC",
+    "moneda": "Pesos",
+    "importe": 284243.39,
+    "fecha": "2026-07-28",
+    "fecha_pago": "2026-08-31",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p36",
+    "nro": 381,
+    "nombre": "AEC - ASOCIACION EMPLEADOS DE COMERCIO ROSARIO",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000003 - HONORARIOS A THOMSOM PARA CANCELACION DE DEUDA AEC",
+    "moneda": "Pesos",
+    "importe": 165404.8,
+    "fecha": "2026-07-28",
+    "fecha_pago": "2026-08-12",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p37",
+    "nro": 426,
+    "nombre": "EPE energia de santa fe",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "28072026 - abono mensual Junin 194",
+    "moneda": "Pesos",
+    "importe": 18125,
+    "fecha": "2026-07-28",
+    "fecha_pago": "2026-08-18",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p38",
+    "nro": 134,
+    "nombre": "Clesape",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00032646 - abono mensual luz cepe",
+    "moneda": "Pesos",
+    "importe": 679217.48,
+    "fecha": "2026-07-29",
+    "fecha_pago": "2026-08-20",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p39",
+    "nro": 1339,
+    "nombre": "COOP. P. SERV. PUB. ZAVALLA LTDA",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00307641 - Abono mensual Agua ZAVALLA, Chiesa y otros",
+    "moneda": "Pesos",
+    "importe": 24967.49,
+    "fecha": "2026-08-03",
+    "fecha_pago": "2026-08-13",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p40",
+    "nro": 167,
+    "nombre": "Ferreteria Ferrind",
+    "proyecto": "CAMPO MADERO 2- IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00011050 - Compra de materiales ferrind",
+    "moneda": "Pesos",
+    "importe": 88931,
+    "fecha": "2026-08-05",
+    "fecha_pago": "2026-08-12",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p41",
+    "nro": 167,
+    "nombre": "Ferreteria Ferrind",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00011060 - Compra de materiales ferrind",
+    "moneda": "Pesos",
+    "importe": 192951.63,
+    "fecha": "2026-08-05",
+    "fecha_pago": "2026-08-12",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p42",
+    "nro": 167,
+    "nombre": "Ferreteria Ferrind",
+    "proyecto": "EL NARANJO 2 - IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00011059 - Compra de materiales en ferrind",
+    "moneda": "Pesos",
+    "importe": 291539.75,
+    "fecha": "2026-08-05",
+    "fecha_pago": "2026-08-12",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p43",
+    "nro": 523,
+    "nombre": "Jornales",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Mr Schwarz",
+    "operacion": "Facturas",
+    "concepto": "00000001 - Jornales correspondiente a la 2Q de Julio 2026",
+    "moneda": "Pesos",
+    "importe": 7550000,
+    "fecha": "2026-08-05",
+    "fecha_pago": "2026-08-07",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p44",
+    "nro": 663,
+    "nombre": "SUELDOS",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000001 - Sueldos oficina corresp a Julio 2026 (WEISS)",
+    "moneda": "Pesos",
+    "importe": 11076330,
+    "fecha": "2026-08-05",
+    "fecha_pago": "2026-08-06",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p45",
+    "nro": 834,
+    "nombre": "Camara Arg de la Construccion",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00149346 - abono mensual camarco",
+    "moneda": "Pesos",
+    "importe": 61664,
+    "fecha": "2026-08-05",
+    "fecha_pago": "2026-08-31",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p46",
+    "nro": 239,
+    "nombre": "MACERONI NOELIA INES",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000049 - Honorarios profesionales Noelia Maceroni",
+    "moneda": "Pesos",
+    "importe": 300000,
+    "fecha": "2026-08-06",
+    "fecha_pago": "2026-08-14",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p47",
+    "nro": 663,
+    "nombre": "SUELDOS",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Mr Schwarz",
+    "operacion": "Facturas",
+    "concepto": "00000001 - Sueldos correspondientes a JULIO 2026 SCH",
+    "moneda": "Pesos",
+    "importe": 12820000,
+    "fecha": "2026-08-06",
+    "fecha_pago": "2026-08-13",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p48",
+    "nro": 1629,
+    "nombre": "HONORARIOS PROFESIONALES",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00000001 - Honorarios corresp a julio 2026",
+    "moneda": "Pesos",
+    "importe": 6137000,
+    "fecha": "2026-08-10",
+    "fecha_pago": "2026-08-10",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p49",
+    "nro": 208,
+    "nombre": "COMBUSTIBLE",
+    "proyecto": "CAMPO MADERO 2- IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00073466 - Combustible para chatita de Roma",
+    "moneda": "Pesos",
+    "importe": 50000.53,
+    "fecha": "2026-08-12",
+    "fecha_pago": "2026-08-12",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p50",
+    "nro": 6783,
+    "nombre": "EPE energia de santa fe",
+    "proyecto": "ROMA MANAGEMENT",
+    "empresa": "Ms Weiss",
+    "operacion": "Cheque Propios",
+    "concepto": "Cheque Banco:Banco Macro Nro: 66925609",
+    "moneda": "Pesos",
+    "importe": 11219783.88,
+    "fecha": "2026-08-14",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p51",
+    "nro": 1001,
+    "nombre": "Cooperativa de Soldini",
+    "proyecto": "ORIGENES - SOLDINI",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "00006974 - Abono mensual de energia electrica",
+    "moneda": "Pesos",
+    "importe": 38943.4,
+    "fecha": "2026-08-15",
+    "fecha_pago": "2026-08-14",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p52",
+    "nro": 5662,
+    "nombre": "AFIP- PARTICIPACION SOCIETARIA",
+    "proyecto": "VRA Consulting",
+    "empresa": "Ms Weiss",
+    "operacion": "Cheque Propios",
+    "concepto": "Cheque Banco:Banco Macro Nro: 13",
+    "moneda": "Pesos",
+    "importe": 747303.89,
+    "fecha": "2026-08-16",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p53",
+    "nro": 5698,
+    "nombre": "AFIP- PARTICIPACION SOCIETARIA",
+    "proyecto": "LOS MUCHACHOS - PIÑERO",
+    "empresa": "Ms Weiss",
+    "operacion": "Cheque Propios",
+    "concepto": "Cheque Banco:Banco Santander Río Nro: 98",
+    "moneda": "Pesos",
+    "importe": 367682.79,
+    "fecha": "2026-08-16",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p54",
+    "nro": 5968,
+    "nombre": "Correa Ángel Rene",
+    "proyecto": "ECO PUEBLO",
+    "empresa": "Ms Weiss",
+    "operacion": "Devolución Clientes",
+    "concepto": "Devolución  1",
+    "moneda": "Pesos",
+    "importe": 8380857,
+    "fecha": "2026-08-24",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p55",
+    "nro": 5968,
+    "nombre": "Correa Ángel Rene",
+    "proyecto": "ECO PUEBLO",
+    "empresa": "Ms Weiss",
+    "operacion": "Devolución Clientes",
+    "concepto": "Devolución  2",
+    "moneda": "Dólares",
+    "importe": 1044,
+    "fecha": "2026-08-24",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p56",
+    "nro": 6758,
+    "nombre": "Jesuan / Electrificación Litoral SRL",
+    "proyecto": "COMUNIDAD EVOLUTIVA - PUEBLO ESTHER",
+    "empresa": "Ms Weiss",
+    "operacion": "Cheque Propios",
+    "concepto": "Cheque Banco:Banco Macro Nro: 96930306",
+    "moneda": "Pesos",
+    "importe": 11875000,
+    "fecha": "2026-08-25",
+    "fecha_pago": "",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p57",
+    "nro": 1101,
+    "nombre": "Cooperativa de energia electrica y consumos Ibarlucea",
+    "proyecto": "EL NARANJO - IBARLUCEA",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "28082026 - Energia portico El Naranjo 1 cuota 4/12",
+    "moneda": "Pesos",
+    "importe": 500000,
+    "fecha": "2026-08-25",
+    "fecha_pago": "2026-08-25",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  },
+  {
+    "id": "p58",
+    "nro": 2722,
+    "nombre": "PLANES DE PAGO AFIP",
+    "proyecto": "VRA Consulting",
+    "empresa": "Ms Weiss",
+    "operacion": "Facturas",
+    "concepto": "27082026 - W186753",
+    "moneda": "Pesos",
+    "importe": 1747461.78,
+    "fecha": "2026-08-27",
+    "fecha_pago": "2026-08-27",
+    "criterio": "",
+    "estado": "pendiente",
+    "abonos": [],
+    "observacion": ""
+  }
+];
 
   var DEFAULT_INGRESOS = [
   {
@@ -1453,14 +2431,12 @@ var stateDocRef = doc(db, "panel_state", "current");
   }
 ];
 
-  var DISPONIBILIDAD_ARS = 26250000.00;
-
   var TABS = {
     pagos: {
-      label:"Pagos", titleField:"compromiso",
-      fields:["compromiso","importe","fecha","abonar","razon_si","razon_no","aclaracion","criterio","estado","abonos","observacion"],
-      importMap:[["compromiso","Compromiso"],["importe","Importe"],["fecha","Fecha"],["abonar","Abonar"],["razon_si","Razon_si"],["razon_no","Razon_no"],["aclaracion","Aclaracion"],["criterio","Criterio"]],
-      newRow:function(){ return {id:"p_"+Date.now()+Math.random(), compromiso:"Nuevo compromiso", importe:0, fecha:"", abonar:0, razon_si:"", razon_no:"", aclaracion:"", criterio:"", estado:"pendiente", abonos:[], observacion:""}; }
+      label:"Pagos", titleField:"nombre",
+      fields:["nro","nombre","proyecto","empresa","operacion","concepto","moneda","importe","fecha","fecha_pago","criterio","estado","abonos","observacion"],
+      importMap:[["nro","Nro"],["nombre","Nombre"],["proyecto","Proyecto"],["empresa","Empresa"],["operacion","Operacion"],["concepto","Concepto"],["moneda","Moneda"],["importe","Importe"],["fecha","Fecha"],["fecha_pago","Fecha Pago"],["criterio","Criterio"]],
+      newRow:function(){ return {id:"p_"+Date.now()+Math.random(), nro:"", nombre:"Nuevo acreedor", proyecto:"", empresa:"", operacion:"", concepto:"", moneda:"Pesos", importe:0, fecha:"", fecha_pago:"", criterio:"", estado:"pendiente", abonos:[], observacion:""}; }
     },
     ingresos: {
       label:"Ingresos", titleField:"nombre",
@@ -1515,27 +2491,30 @@ var stateDocRef = doc(db, "panel_state", "current");
     }catch(e){ return null; }
   }
 
+  // el esquema de Pagos/Ingresos cambió (ahora traen los datos reales del Excel de Athan): si lo
+  // guardado (localStorage o Firestore) es del esquema viejo, se reemplaza por los datos por
+  // defecto nuevos. Un array vacío es un estado válido (se borró todo a propósito) y se respeta.
+  function fixSchema(s){
+    if(!s.ingresos || !s.ingresos.rows){
+      s.ingresos = {rows: DEFAULT_INGRESOS.map(function(r){ return Object.assign({}, r); })};
+    } else if(s.ingresos.rows.length && s.ingresos.rows[0].nombre === undefined){
+      s.ingresos = {rows: DEFAULT_INGRESOS.map(function(r){ return Object.assign({}, r); })};
+    }
+    if(!s.pagos || !s.pagos.rows){
+      s.pagos = {rows: DEFAULT_PAGOS.map(function(r){ return Object.assign({}, r); })};
+    } else if(s.pagos.rows.length && s.pagos.rows[0].nombre === undefined){
+      s.pagos = {rows: DEFAULT_PAGOS.map(function(r){ return Object.assign({}, r); })};
+    }
+    if(!s.nominas || !s.nominas.rows){
+      s.nominas = {rows: DEFAULT_NOMINAS.map(function(r){ return Object.assign({}, r); })};
+    }
+    return s;
+  }
+
   function load(){
     try{
       var raw = localStorage.getItem(STORAGE_KEY);
-      if(raw){
-        var s = JSON.parse(raw);
-        // el esquema de Ingresos cambió (ahora trae los datos reales de cobros): si lo guardado
-        // es del esquema viejo se reemplaza por los datos por defecto. Un array vacío es un
-        // estado válido (el usuario borró todo a propósito) y se respeta, nunca se repone solo.
-        if(!s.ingresos || !s.ingresos.rows){
-          s.ingresos = {rows: DEFAULT_INGRESOS.map(function(r){ return Object.assign({}, r); })};
-        } else if(s.ingresos.rows.length && s.ingresos.rows[0].nombre === undefined){
-          s.ingresos = {rows: DEFAULT_INGRESOS.map(function(r){ return Object.assign({}, r); })};
-        }
-        if(!s.pagos || !s.pagos.rows){
-          s.pagos = {rows: DEFAULT_PAGOS.map(function(r){ return Object.assign({}, r); })};
-        }
-        if(!s.nominas || !s.nominas.rows){
-          s.nominas = {rows: DEFAULT_NOMINAS.map(function(r){ return Object.assign({}, r); })};
-        }
-        return s;
-      }
+      if(raw) return fixSchema(JSON.parse(raw));
     }catch(e){}
     return migrateV1() || defaultState();
   }
@@ -1600,7 +2579,7 @@ var stateDocRef = doc(db, "panel_state", "current");
   function renderIoLabel(){
     document.getElementById("ioTabName").textContent = TABS[state.activeTab].label;
     var notes = {
-      pagos:"Compromiso, Importe, Fecha, Abonar, Razon_si, Razon_no, Aclaracion, Criterio. Podés pegar texto, subir un .csv o un .xlsx (primera hoja). Los .pdf hay que pasarlos primero a Excel.",
+      pagos:"Nro, Nombre, Proyecto, Empresa, Operacion, Concepto, Moneda, Importe, Fecha, Fecha Pago, Criterio. Podés pegar texto, subir un .csv o un .xlsx (primera hoja). Los .pdf hay que pasarlos primero a Excel.",
       ingresos:"Nro, Nombre, Proyecto, Empresa, Concepto, Moneda, Importe, Fecha, Fecha Pago, Criterio. Podés pegar texto, subir un .csv o un .xlsx.",
       nominas:"Nombre, Estado, Salario_mensual, Adeudado, Criterio, Comentarios. Podés pegar texto, subir un .csv o un .xlsx."
     };
@@ -1631,44 +2610,45 @@ var stateDocRef = doc(db, "panel_state", "current");
       + '</div>';
   }
 
+  function isUSD(moneda){ return /d[oó]lar|usd/i.test(moneda||""); }
+
+  function pagosStatsHtml(rows){
+    var usdRows = rows.filter(function(r){ return isUSD(r.moneda); });
+    var arsRows = rows.filter(function(r){ return !isUSD(r.moneda); });
+    var restUSD = usdRows.reduce(function(s,r){ return s + r.importe - montoPagado(r,"importe"); },0);
+    var restARS = arsRows.reduce(function(s,r){ return s + r.importe - montoPagado(r,"importe"); },0);
+    var pendiente = rows.filter(function(r){ return r.estado==="pendiente"; }).length;
+    return [
+      {label:"Comprometido pendiente (USD)", val:"US$ "+Number(restUSD).toLocaleString("en-US",{minimumFractionDigits:2}), cls:""},
+      {label:"Comprometido pendiente (ARS)", val:money(restARS), cls:""},
+      {label:"Marcado hecho / parcial", val:(rows.length-pendiente)+" de "+rows.length, cls:"good"},
+      {label:"Pendiente de tildar", val:String(pendiente), cls:"warning"}
+    ].map(statCard).join("");
+  }
+
   function renderPagos(){
     var rows = state.pagos.rows;
     var tbody = document.getElementById("rowsPagos");
     tbody.innerHTML = rows.map(function(r, i){
-      var motivo = '<div class="motivo-cell">'
-        + '<input type="text" class="motivo-input si text-input" data-tab="pagos" data-i="'+i+'" data-action="razon_si" value="'+esc(r.razon_si)+'" placeholder="Sí: motivo..." />'
-        + '<input type="text" class="motivo-input no text-input" data-tab="pagos" data-i="'+i+'" data-action="razon_no" value="'+esc(r.razon_no)+'" placeholder="No: motivo..." />'
-        + '<input type="text" class="motivo-input acl text-input" data-tab="pagos" data-i="'+i+'" data-action="aclaracion" value="'+esc(r.aclaracion)+'" placeholder="Aclaración..." />'
-        + '</div>';
       return '<tr data-estado="'+r.estado+'">'
-        + '<td><input type="text" class="text-input" data-tab="pagos" data-i="'+i+'" data-action="compromiso" value="'+esc(r.compromiso)+'" /></td>'
+        + '<td class="fecha-cell">'+esc(r.nro)+'</td>'
+        + '<td><input type="text" class="text-input" data-tab="pagos" data-i="'+i+'" data-action="nombre" value="'+esc(r.nombre)+'" /></td>'
+        + '<td><input type="text" class="text-input" data-tab="pagos" data-i="'+i+'" data-action="proyecto" value="'+esc(r.proyecto)+'" /></td>'
+        + '<td><input type="text" class="text-input" style="width:6rem" data-tab="pagos" data-i="'+i+'" data-action="empresa" value="'+esc(r.empresa)+'" /></td>'
+        + '<td><input type="text" class="text-input" style="width:7rem" data-tab="pagos" data-i="'+i+'" data-action="operacion" value="'+esc(r.operacion)+'" /></td>'
+        + '<td><input type="text" class="text-input" style="width:10rem" data-tab="pagos" data-i="'+i+'" data-action="concepto" value="'+esc(r.concepto)+'" /></td>'
+        + '<td><input type="text" class="text-input" style="width:5.5rem" data-tab="pagos" data-i="'+i+'" data-action="moneda" value="'+esc(r.moneda)+'" /></td>'
         + '<td><input type="number" step="0.01" class="num-input num" data-tab="pagos" data-i="'+i+'" data-action="importe" value="'+r.importe+'" /></td>'
-        + '<td><input type="text" class="text-input fecha-cell" style="width:5rem" data-tab="pagos" data-i="'+i+'" data-action="fecha" value="'+esc(r.fecha)+'" /></td>'
-        + '<td class="num">'+money(r.abonar)+'</td>'
-        + '<td>'+motivo+'</td>'
+        + '<td><input type="text" class="text-input fecha-cell" style="width:5.5rem" data-tab="pagos" data-i="'+i+'" data-action="fecha" value="'+esc(r.fecha)+'" /></td>'
+        + '<td><input type="text" class="text-input fecha-cell" style="width:5.5rem" data-tab="pagos" data-i="'+i+'" data-action="fecha_pago" value="'+esc(r.fecha_pago)+'" placeholder="—" /></td>'
         + '<td><input type="text" class="text-input" data-tab="pagos" data-i="'+i+'" data-action="criterio" value="'+esc(r.criterio)+'" placeholder="Criterio..." /></td>'
         + '<td class="estado-cell">'+segButtons(r,"pagos",i)+abonosBlock(r,"pagos",i)+'</td>'
         + '<td><input type="text" class="text-input" data-tab="pagos" data-i="'+i+'" data-action="observacion" value="'+esc(r.observacion)+'" placeholder="Observación..." /></td>'
         + '<td><button type="button" class="del-btn" data-tab="pagos" data-i="'+i+'" data-action="del" title="Eliminar">🗑</button></td>'
         + '</tr>';
     }).join("");
-
-    var totalImporte = rows.reduce(function(s,r){ return s+r.importe; },0);
-    var totalPlan = rows.reduce(function(s,r){ return s+r.abonar; },0);
-    var pagadoReal = rows.reduce(function(s,r){ return s+montoPagado(r,"importe"); },0);
-    var comprometidoRestante = totalImporte - pagadoReal;
-    var pendiente = rows.filter(function(r){ return r.estado==="pendiente"; }).length;
-    var restante = DISPONIBILIDAD_ARS - pagadoReal;
-    document.getElementById("statsPagos").innerHTML = [
-      {label:"Total comprometido", val:money(comprometidoRestante), cls:""},
-      {label:"Plan a abonar", val:money(totalPlan), cls:""},
-      {label:"Marcado hecho + parcial", val:money(pagadoReal), cls:"good"},
-      {label:"Pendiente de tildar", val:pendiente+" de "+rows.length, cls:"warning"},
-      {label:"Disponibilidad restante", val:money(restante), cls:"accent"}
-    ].map(statCard).join("");
+    document.getElementById("statsPagos").innerHTML = pagosStatsHtml(rows);
   }
-
-  function isUSD(moneda){ return /d[oó]lar|usd/i.test(moneda||""); }
 
   function ingresosStatsHtml(rows){
     var usdRows = rows.filter(function(r){ return isUSD(r.moneda); });
@@ -1823,20 +2803,7 @@ var stateDocRef = doc(db, "panel_state", "current");
 
   function recalcStatsOnly(tab){
     if(tab==="pagos"){
-      var rows = state.pagos.rows;
-      var totalImporte = rows.reduce(function(s,r){ return s+r.importe; },0);
-      var totalPlan = rows.reduce(function(s,r){ return s+r.abonar; },0);
-      var pagadoReal = rows.reduce(function(s,r){ return s+montoPagado(r,"importe"); },0);
-      var comprometidoRestante = totalImporte - pagadoReal;
-      var pendiente = rows.filter(function(r){ return r.estado==="pendiente"; }).length;
-      var restante = DISPONIBILIDAD_ARS - pagadoReal;
-      document.getElementById("statsPagos").innerHTML = [
-        {label:"Total comprometido", val:money(comprometidoRestante), cls:""},
-        {label:"Plan a abonar", val:money(totalPlan), cls:""},
-        {label:"Marcado hecho + parcial", val:money(pagadoReal), cls:"good"},
-        {label:"Pendiente de tildar", val:pendiente+" de "+rows.length, cls:"warning"},
-        {label:"Disponibilidad restante", val:money(restante), cls:"accent"}
-      ].map(statCard).join("");
+      document.getElementById("statsPagos").innerHTML = pagosStatsHtml(state.pagos.rows);
     } else if(tab==="ingresos"){
       document.getElementById("statsIngresos").innerHTML = ingresosStatsHtml(state.ingresos.rows);
     } else if(tab==="nominas"){
@@ -2057,7 +3024,7 @@ var stateDocRef = doc(db, "panel_state", "current");
     }
     var remote = snap.data();
     if(remote.updatedAt === lastPushedAt) return; // eco de nuestro propio guardado, ya lo tenemos
-    state = remote;
+    state = fixSchema(remote);
     render();
     storageBroken = false;
     updateStorageWarning();
