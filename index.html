@@ -187,12 +187,11 @@
         <span class="hint">Relevado al 12-08-2026 · en USD salvo indicación</span>
       </div>
       <div class="disp-row">
-        <div class="disp-card"><div class="label">Banco</div><input type="number" step="0.01" class="disp-input num" id="bancoInput" value="11400" /></div>
-        <div class="disp-card"><div class="label">Tesoro</div><input type="number" step="0.01" class="disp-input num" id="tesoroInput" value="6100" /></div>
         <div class="disp-card"><div class="label">Posibles ingresos</div><div class="val num">—</div><div class="sub">14-ago</div></div>
         <div class="disp-card"><div class="label">Tipo de cambio</div><input type="number" step="0.01" class="disp-input num" id="tipoCambioInput" value="1500" /></div>
+        <div class="disp-card"><div class="label">Disponibilidad (USD)</div><input type="number" step="0.01" class="disp-input num" id="dispUsdTotalInput" value="17500" /><div class="sub">editable a mano</div></div>
         <div class="disp-card"><div class="label">Disponibilidad (ARS)</div><input type="number" step="0.01" class="disp-input num" id="dispArsTotalInput" value="26250000" /><div class="sub">editable a mano</div></div>
-        <div class="disp-card accent" style="border-color:var(--accent)"><div class="label">Restante (USD)</div><div class="val num" id="dispRestanteUSD">US$ 17,500.00</div><div class="sub">Banco + Tesoro, menos pagos en dólares</div></div>
+        <div class="disp-card accent" style="border-color:var(--accent)"><div class="label">Restante (USD)</div><div class="val num" id="dispRestanteUSD">US$ 17,500.00</div><div class="sub">baja sola con pagos en dólares</div></div>
         <div class="disp-card accent" style="border-color:var(--accent)"><div class="label">Restante (ARS)</div><div class="val num" id="dispRestanteARS">$ 26,250,000.00</div><div class="sub">baja sola con pagos en pesos</div></div>
       </div>
     </section>
@@ -2412,7 +2411,7 @@ var stateDocRef = doc(db, "panel_state", "current");
       pagos:{rows: DEFAULT_PAGOS.map(function(r){ return Object.assign({}, r); })},
       ingresos:{rows: DEFAULT_INGRESOS.map(function(r){ return Object.assign({}, r); })},
       nominas:{rows: DEFAULT_NOMINAS.map(function(r){ return Object.assign({}, r); })},
-      disponibilidad: {banco: 11400, tesoro: 6100, arsTotal: 26250000, tipoCambio: 1500},
+      disponibilidad: {usdTotal: 17500, arsTotal: 26250000, tipoCambio: 1500},
       updatedAt:null
     };
   }
@@ -2454,11 +2453,11 @@ var stateDocRef = doc(db, "panel_state", "current");
       s.nominas = {rows: DEFAULT_NOMINAS.map(function(r){ return Object.assign({}, r); })};
     }
     if(!s.disponibilidad){
-      s.disponibilidad = {banco: 11400, tesoro: 6100, arsTotal: 26250000, tipoCambio: 1500};
-    } else if(s.disponibilidad.banco === undefined || s.disponibilidad.tesoro === undefined){
-      s.disponibilidad.banco = 11400;
-      s.disponibilidad.tesoro = 6100;
-      delete s.disponibilidad.usdTotal;
+      s.disponibilidad = {usdTotal: 17500, arsTotal: 26250000, tipoCambio: 1500};
+    } else if(s.disponibilidad.usdTotal === undefined){
+      s.disponibilidad.usdTotal = (s.disponibilidad.banco || 0) + (s.disponibilidad.tesoro || 0) || 17500;
+      delete s.disponibilidad.banco;
+      delete s.disponibilidad.tesoro;
     }
     return s;
   }
@@ -2570,17 +2569,14 @@ var stateDocRef = doc(db, "panel_state", "current");
       .reduce(function(s,r){ return s + montoPagado(r,"importe"); },0);
     var pagadoARS = rows.filter(function(r){ return !isUSD(r.moneda); })
       .reduce(function(s,r){ return s + montoPagado(r,"importe"); },0);
-    var usdTotal = state.disponibilidad.banco + state.disponibilidad.tesoro;
-    var restanteUSD = usdTotal - pagadoUSD;
+    var restanteUSD = state.disponibilidad.usdTotal - pagadoUSD;
     var restanteARS = state.disponibilidad.arsTotal - pagadoARS;
     var elUSD = document.getElementById("dispRestanteUSD");
     var elARS = document.getElementById("dispRestanteARS");
-    var elBanco = document.getElementById("bancoInput");
-    var elTesoro = document.getElementById("tesoroInput");
+    var elUsdInput = document.getElementById("dispUsdTotalInput");
     var elArsInput = document.getElementById("dispArsTotalInput");
     var elTC = document.getElementById("tipoCambioInput");
-    if(elBanco && document.activeElement !== elBanco) elBanco.value = state.disponibilidad.banco;
-    if(elTesoro && document.activeElement !== elTesoro) elTesoro.value = state.disponibilidad.tesoro;
+    if(elUsdInput && document.activeElement !== elUsdInput) elUsdInput.value = state.disponibilidad.usdTotal;
     if(elArsInput && document.activeElement !== elArsInput) elArsInput.value = state.disponibilidad.arsTotal;
     if(elTC && document.activeElement !== elTC) elTC.value = state.disponibilidad.tipoCambio;
     if(elUSD) elUSD.textContent = "US$ " + Number(restanteUSD).toLocaleString("en-US",{minimumFractionDigits:2});
@@ -3017,7 +3013,7 @@ var stateDocRef = doc(db, "panel_state", "current");
     msg.style.color = "var(--ink-soft)"; msg.textContent = "Descargado.";
   });
 
-  [["bancoInput","banco"],["tesoroInput","tesoro"],["dispArsTotalInput","arsTotal"],["tipoCambioInput","tipoCambio"]].forEach(function(pair){
+  [["dispUsdTotalInput","usdTotal"],["dispArsTotalInput","arsTotal"],["tipoCambioInput","tipoCambio"]].forEach(function(pair){
     document.getElementById(pair[0]).addEventListener("input", function(e){
       state.disponibilidad[pair[1]] = parseFloat(e.target.value) || 0;
       save();
