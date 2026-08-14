@@ -55,6 +55,30 @@
   .top .fecha b{color:var(--ink); font-size:.95rem;}
 
   .storage-warning{display:flex; align-items:center; gap:.5rem; background:var(--critical-soft); border:1px solid var(--critical); border-radius:8px; padding:.7rem 1rem; font-size:.8125rem; color:var(--critical);}
+
+  .auth-bar{display:flex; align-items:center; gap:.8rem; flex-wrap:wrap;}
+  .auth-status{display:flex; align-items:center; gap:.6rem;}
+  .auth-pill{display:inline-flex; align-items:center; gap:.35rem; padding:.3rem .65rem; border-radius:999px; font-size:.75rem; font-weight:700; background:var(--surface-2); color:var(--ink-soft); border:1px solid var(--border);}
+  .auth-pill.admin{background:var(--good-soft); color:var(--good); border-color:transparent;}
+  .link-btn{all:unset; cursor:pointer; font-size:.75rem; font-weight:700; color:var(--accent);}
+  .link-btn:hover{text-decoration:underline;}
+  .auth-form{display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;}
+  .auth-form input{padding:.35rem .55rem; font-size:.8125rem; width:11rem;}
+  .auth-error{font-size:.75rem; color:var(--critical);}
+
+  body.guest-mode input:not(#authEmail_input):not(#authPassword_input),
+  body.guest-mode textarea,
+  body.guest-mode .seg button,
+  body.guest-mode .del-btn,
+  body.guest-mode .add-abono,
+  body.guest-mode .abono-del,
+  body.guest-mode .add-row-btn,
+  body.guest-mode #btnImportPaste,
+  body.guest-mode #fileInput,
+  body.guest-mode #btnReset{
+    pointer-events:none; opacity:.55; cursor:not-allowed;
+  }
+  body.guest-mode .panel-io .io-col:first-child{ opacity:.55; }
   nav.tabs{display:flex; gap:.4rem; border-bottom:1px solid var(--border);}
   nav.tabs button{all:unset; cursor:pointer; padding:.6rem 1rem; font-size:.875rem; font-weight:700; color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-1px;}
   nav.tabs button:hover{color:var(--ink);}
@@ -166,6 +190,23 @@
     </div>
     <div class="fecha">Estado de situación<br><b id="fechaEstado">14-08-2026</b></div>
   </header>
+
+  <div class="auth-bar" id="authBar">
+    <div class="auth-status" id="authStatusGuest">
+      <span class="auth-pill">👁 Modo lectura</span>
+      <button type="button" class="link-btn" id="btnShowLogin">Iniciar sesión como admin</button>
+    </div>
+    <div class="auth-status" id="authStatusAdmin" style="display:none">
+      <span class="auth-pill admin">🔓 Modo edición · <span id="authEmail"></span></span>
+      <button type="button" class="link-btn" id="btnLogout">Salir</button>
+    </div>
+    <form class="auth-form" id="authForm" style="display:none">
+      <input type="email" id="authEmail_input" placeholder="Email" autocomplete="username" required />
+      <input type="password" id="authPassword_input" placeholder="Contraseña" autocomplete="current-password" required />
+      <button type="submit" class="btn primary">Entrar</button>
+      <span class="auth-error" id="authError"></span>
+    </form>
+  </div>
 
   <div class="storage-warning" id="storageWarning" style="display:none">
     <span>⚠️ No se pudo conectar con la base de datos compartida — tus cambios se están guardando solo en este navegador por ahora. Descargá el CSV de cada solapa como respaldo hasta que vuelva la conexión.</span>
@@ -296,6 +337,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 var firebaseConfig = {
   apiKey: "AIzaSyB1EE_S6X46pxN9Zr6yMCuPUJoeXqebAbc",
@@ -307,6 +349,7 @@ var firebaseConfig = {
 };
 var fbApp = initializeApp(firebaseConfig);
 var db = getFirestore(fbApp);
+var auth = getAuth(fbApp);
 var stateDocRef = doc(db, "panel_state", "current");
 
 (function(){
@@ -3029,6 +3072,43 @@ var stateDocRef = doc(db, "panel_state", "current");
     render();
     save();
   });
+
+  // ---------- login admin / modo lectura ----------
+  var isAdmin = false;
+  document.body.classList.add("guest-mode"); // por defecto arranca en solo lectura
+
+  function applyAuthUI(user){
+    isAdmin = !!user;
+    document.body.classList.toggle("guest-mode", !isAdmin);
+    document.getElementById("authStatusGuest").style.display = isAdmin ? "none" : "flex";
+    document.getElementById("authStatusAdmin").style.display = isAdmin ? "flex" : "none";
+    document.getElementById("authForm").style.display = "none";
+    if(isAdmin) document.getElementById("authEmail").textContent = user.email;
+  }
+
+  document.getElementById("btnShowLogin").addEventListener("click", function(){
+    var form = document.getElementById("authForm");
+    form.style.display = (form.style.display === "none" || !form.style.display) ? "flex" : "none";
+  });
+
+  document.getElementById("authForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var email = document.getElementById("authEmail_input").value;
+    var pass = document.getElementById("authPassword_input").value;
+    var errEl = document.getElementById("authError");
+    errEl.textContent = "";
+    signInWithEmailAndPassword(auth, email, pass).then(function(){
+      document.getElementById("authPassword_input").value = "";
+    }).catch(function(){
+      errEl.textContent = "Email o contraseña incorrectos.";
+    });
+  });
+
+  document.getElementById("btnLogout").addEventListener("click", function(){
+    signOut(auth);
+  });
+
+  onAuthStateChanged(auth, applyAuthUI);
 
   render();
   updateStorageWarning();
