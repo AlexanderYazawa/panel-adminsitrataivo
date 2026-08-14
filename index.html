@@ -180,6 +180,17 @@
   footer.foot{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem; font-size:.75rem; color:var(--muted); border-top:1px solid var(--border); padding-top:.9rem;}
   footer.foot button.link{all:unset; cursor:pointer; color:var(--critical); font-weight:700; font-size:.75rem;}
   footer.foot button.link:hover{text-decoration:underline;}
+
+  .scroll-arrow{
+    position:fixed; top:50%; transform:translateY(-50%); z-index:40;
+    width:2.4rem; height:2.4rem; border-radius:50%;
+    background:var(--surface); border:1px solid var(--border-strong); box-shadow:var(--shadow);
+    font-size:1rem; color:var(--ink-soft); cursor:pointer; opacity:.8;
+  }
+  .scroll-arrow:hover{opacity:1; background:var(--surface-2); color:var(--ink);}
+  .scroll-arrow.left{left:.6rem;}
+  .scroll-arrow.right{right:.6rem;}
+  @media (max-width:700px){ .scroll-arrow{display:none;} }
 </style>
 
 <div class="wrap">
@@ -333,6 +344,9 @@
     <button class="link" id="btnReset">Restaurar datos originales</button>
   </footer>
 </div>
+
+<button type="button" class="scroll-arrow left" id="scrollArrowLeft" title="Desplazar tabla a la izquierda" aria-label="Desplazar tabla a la izquierda">◀</button>
+<button type="button" class="scroll-arrow right" id="scrollArrowRight" title="Desplazar tabla a la derecha" aria-label="Desplazar tabla a la derecha">▶</button>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -3135,6 +3149,17 @@ var stateDocRef = doc(db, "panel_state", "current");
   setupScrollSync("nominas", "scrollTopNominas", "tableScrollNominas");
   window.addEventListener("resize", function(){
     Object.keys(scrollSyncs).forEach(function(k){ scrollSyncs[k](); });
+  });
+
+  var TABLE_SCROLL_IDS = {pagos:"tableScrollPagos", ingresos:"tableScrollIngresos", nominas:"tableScrollNominas"};
+  function activeTableScroll(){ return document.getElementById(TABLE_SCROLL_IDS[state.activeTab]); }
+  document.getElementById("scrollArrowLeft").addEventListener("click", function(){
+    var el = activeTableScroll();
+    if(el) el.scrollBy({left:-320, behavior:"smooth"});
+  });
+  document.getElementById("scrollArrowRight").addEventListener("click", function(){
+    var el = activeTableScroll();
+    if(el) el.scrollBy({left:320, behavior:"smooth"});
   });
 })();
 </script>
