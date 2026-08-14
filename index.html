@@ -3153,13 +3153,31 @@ var stateDocRef = doc(db, "panel_state", "current");
 
   var TABLE_SCROLL_IDS = {pagos:"tableScrollPagos", ingresos:"tableScrollIngresos", nominas:"tableScrollNominas"};
   function activeTableScroll(){ return document.getElementById(TABLE_SCROLL_IDS[state.activeTab]); }
-  document.getElementById("scrollArrowLeft").addEventListener("click", function(){
+
+  var scrollHoldStop = null;
+  function startAutoScroll(direction){
     var el = activeTableScroll();
-    if(el) el.scrollBy({left:-320, behavior:"smooth"});
-  });
-  document.getElementById("scrollArrowRight").addEventListener("click", function(){
-    var el = activeTableScroll();
-    if(el) el.scrollBy({left:320, behavior:"smooth"});
-  });
+    if(!el) return function(){};
+    var speed = 18, raf = null, stopped = false;
+    function tick(){
+      if(stopped) return;
+      el.scrollLeft += direction * speed;
+      speed = Math.min(speed * 1.05, 90);
+      raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+    return function stop(){ stopped = true; if(raf) cancelAnimationFrame(raf); };
+  }
+  function bindHoldScroll(id, direction){
+    var btn = document.getElementById(id);
+    function start(e){ e.preventDefault(); if(scrollHoldStop) scrollHoldStop(); scrollHoldStop = startAutoScroll(direction); }
+    function stop(){ if(scrollHoldStop){ scrollHoldStop(); scrollHoldStop = null; } }
+    btn.addEventListener("pointerdown", start);
+    btn.addEventListener("pointerup", stop);
+    btn.addEventListener("pointerleave", stop);
+    btn.addEventListener("pointercancel", stop);
+  }
+  bindHoldScroll("scrollArrowLeft", -1);
+  bindHoldScroll("scrollArrowRight", 1);
 })();
 </script>
